@@ -14,7 +14,7 @@ C# on **.NET 10** that satisfies the attached specification
 **Framework for this build:** scaffold the solution with the Trellis ASP template:
 
 ```
-dotnet new install Trellis.AspTemplate
+dotnet new install Trellis.AspTemplate@1.0.21-alpha
 dotnet new trellis-asp -n OrderManagement
 ```
 
