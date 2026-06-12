@@ -54,6 +54,7 @@ rubric/               the 30 outcome-only scoring criteria
 runs/                 the 18 raw generated services (+ per-run result.json)
 harness/              Python scorer: probe.py, static_checks.py, run_all.py, aggregate.py
 results/              generated headline + per-criterion tables
+GENERATION.md         clean-room runbook for producing the 18 services
 METHODOLOGY.md        design, controls, and threats to validity
 ```
 
@@ -68,11 +69,11 @@ python run_all.py --all     # build → boot → probe → test every run
 python aggregate.py         # roll up into results/
 ```
 
-To regenerate a service, hand a model the matching file in [`prompts/`](prompts/) together with
-[`spec/order-management.md`](spec/order-management.md), drop the output into the right
-`runs/<condition>/<model>/run-N/` folder, and re-run the harness. See
-[`runs/README.md`](runs/README.md) for the folder convention and the per-run `meta.json` audit
-schema.
+To regenerate the services, follow the clean-room runbook in
+[`GENERATION.md`](GENERATION.md): each is produced in isolation from the self-contained paste
+file in [`prompts/paste/`](prompts/paste/) (prompt + spec, nothing else), then dropped into the
+matching `runs/<condition>/<model>/run-N/` folder. See [`runs/README.md`](runs/README.md) for
+the folder convention and the per-run `meta.json` audit schema.
 
 ## License
 
