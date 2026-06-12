@@ -1,0 +1,14 @@
+{
+  "condition": "without-trellis",
+  "model": "sonnet-4.6",
+  "run": 3,
+  "generated_at": "",
+  "prompt": "prompts/paste/without-trellis.md",
+  "prompt_sha256": "1280d5a4312d4bb789b455c1a4bb4faa196ad486f4170b15e284d6e30b86bf12",
+  "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
+  "template": null,
+  "trellis_packages": null,
+  "dotnet_sdk": "10.0.301",
+  "generator": "manual clean-room",
+  "notes": ""
+}

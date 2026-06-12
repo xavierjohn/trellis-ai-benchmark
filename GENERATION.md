@@ -20,32 +20,37 @@ Use a scratch root such as `C:\bench\` (anywhere outside the Trellis tree).
   add hints, the rubric, or anything from this repo.
 - The two paste files are **identical except for one paragraph** (the framework provided).
   `git diff --no-index prompts/paste/without-trellis.md prompts/paste/with-trellis.md` shows it.
+- **There are only two distinct prompts.** The *model* and *run number* are not part of the
+  prompt — they are determined by which CLI session you start. So you run the with-Trellis
+  prompt 9 times (3 models × 3 runs) and the without-Trellis prompt 9 times.
+
+The 18 run slots under `runs/` are already created, each with a pre-filled `meta.json` (prompt
+and spec SHA-256 hashes, template/package versions, SDK). You only add `generated_at` and, for
+baseline runs, the stack the model chose in `notes`.
 
 ## Procedure (repeat for each of the 18 cells)
 
 For condition `C` ∈ {with-trellis, without-trellis}, model `M` ∈ {gpt-5.5, opus-4.8,
 sonnet-4.6}, run `N` ∈ {1, 2, 3}:
 
-1. **Fresh scratch dir, outside the Trellis tree:** `mkdir C:\bench\C\M\run-N` and open a brand
-   new agent session there (new context, model = `M`). Confirm the session cannot see the
-   Trellis tree.
+1. **Fresh scratch dir, outside the Trellis tree:** `mkdir C:\bench\C\M\run-N` and `cd` into it,
+   then start a brand new CLI session there with model `M` selected. Confirm the session's
+   working directory is the scratch dir (it must not be able to reach the Trellis tree).
 2. **Paste** the entire contents of `prompts/paste/C.md` as the task. Let the model build the
    service to completion (it should build, expose `/health`, and ship a passing test suite).
 3. **Verify locally** in the scratch dir: `dotnet build -c Release` and `dotnet test -c Release`
    succeed, and the app starts.
-4. **Copy the generated solution** into this repo at `runs/C/M/run-N/` (source only — `bin/`,
-   `obj/`, and `*.db` are git-ignored). Do **not** edit the generated code; it is the evidence.
-5. **Record `runs/C/M/run-N/meta.json`** from `runs/meta.template.json` (set `condition`,
-   `model`, `run`, `dotnet_sdk`, and — for `without-trellis` — the stack the model chose in
-   `notes`; set `template`/`trellis_packages` to `null` for `without-trellis`). Fill the
-   hashes with:
+4. **Intake** — copy the generated source into its slot (skips bin/obj/.db, keeps `meta.json`):
 
    ```powershell
-   (Get-FileHash prompts\paste\C.md -Algorithm SHA256).Hash.ToLower()       # -> prompt_sha256
-   (Get-FileHash spec\order-management.md -Algorithm SHA256).Hash.ToLower()  # -> spec_sha256
+   cd C:\github\xavier\Trellis\trellis-ai-benchmark\harness
+   python intake.py C:\bench\C\M\run-N --condition C --model M --run N
    ```
 
-6. **Delete the scratch dir** once copied.
+   Do **not** edit the generated code; it is the evidence.
+5. **Finish `meta.json`** in `runs/C/M/run-N/`: set `generated_at`, and for `without-trellis`
+   put the stack the model chose into `notes`. (Hashes, versions, and SDK are already filled.)
+6. **Delete the scratch dir** once intake succeeds.
 
 ## Then score
 
@@ -58,6 +63,31 @@ python aggregate.py         # -> results/summary.md + results/criteria-matrix.md
 
 `run_all.py` writes a `result.json` (all 30 criteria, with evidence) into each run folder; it
 infers `condition`/`model`/`run` from `meta.json` (or the path). Re-running is idempotent.
+
+## The 18 cells (tick as you go)
+
+Two prompts, nine sessions each. Pick the model in the CLI; the run number is just a repeat.
+
+| # | Prompt to paste | Model in CLI | Slot |
+|---|---|---|---|
+| 1 | `prompts/paste/without-trellis.md` | gpt-5.5 | `runs/without-trellis/gpt-5.5/run-1` |
+| 2 | `prompts/paste/without-trellis.md` | gpt-5.5 | `runs/without-trellis/gpt-5.5/run-2` |
+| 3 | `prompts/paste/without-trellis.md` | gpt-5.5 | `runs/without-trellis/gpt-5.5/run-3` |
+| 4 | `prompts/paste/without-trellis.md` | opus-4.8 | `runs/without-trellis/opus-4.8/run-1` |
+| 5 | `prompts/paste/without-trellis.md` | opus-4.8 | `runs/without-trellis/opus-4.8/run-2` |
+| 6 | `prompts/paste/without-trellis.md` | opus-4.8 | `runs/without-trellis/opus-4.8/run-3` |
+| 7 | `prompts/paste/without-trellis.md` | sonnet-4.6 | `runs/without-trellis/sonnet-4.6/run-1` |
+| 8 | `prompts/paste/without-trellis.md` | sonnet-4.6 | `runs/without-trellis/sonnet-4.6/run-2` |
+| 9 | `prompts/paste/without-trellis.md` | sonnet-4.6 | `runs/without-trellis/sonnet-4.6/run-3` |
+| 10 | `prompts/paste/with-trellis.md` | gpt-5.5 | `runs/with-trellis/gpt-5.5/run-1` |
+| 11 | `prompts/paste/with-trellis.md` | gpt-5.5 | `runs/with-trellis/gpt-5.5/run-2` |
+| 12 | `prompts/paste/with-trellis.md` | gpt-5.5 | `runs/with-trellis/gpt-5.5/run-3` |
+| 13 | `prompts/paste/with-trellis.md` | opus-4.8 | `runs/with-trellis/opus-4.8/run-1` |
+| 14 | `prompts/paste/with-trellis.md` | opus-4.8 | `runs/with-trellis/opus-4.8/run-2` |
+| 15 | `prompts/paste/with-trellis.md` | opus-4.8 | `runs/with-trellis/opus-4.8/run-3` |
+| 16 | `prompts/paste/with-trellis.md` | sonnet-4.6 | `runs/with-trellis/sonnet-4.6/run-1` |
+| 17 | `prompts/paste/with-trellis.md` | sonnet-4.6 | `runs/with-trellis/sonnet-4.6/run-2` |
+| 18 | `prompts/paste/with-trellis.md` | sonnet-4.6 | `runs/with-trellis/sonnet-4.6/run-3` |
 
 ## Integrity checklist (for the write-up)
 

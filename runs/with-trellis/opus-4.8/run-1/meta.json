@@ -1,0 +1,14 @@
+{
+  "condition": "with-trellis",
+  "model": "opus-4.8",
+  "run": 1,
+  "generated_at": "",
+  "prompt": "prompts/paste/with-trellis.md",
+  "prompt_sha256": "59ab617e27df5b9271a24afc77918b230995009ea2894fb1268fc1c0b295937c",
+  "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
+  "template": "Trellis.AspTemplate 1.0.21-alpha",
+  "trellis_packages": "3.0.0-alpha.382",
+  "dotnet_sdk": "10.0.301",
+  "generator": "manual clean-room",
+  "notes": ""
+}
