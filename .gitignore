@@ -1,0 +1,26 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+**/.vs/
+*.user
+*.suo
+
+# Generated SQLite databases from probe runs
+*.db
+*.db-shm
+*.db-wal
+
+# Trellis ASP template boilerplate inside with-trellis runs.
+# These ship identically with every `dotnet new trellis-asp`; the template
+# version is recorded in each run's meta.json, so we don't commit 9 copies.
+runs/with-trellis/**/.github/trellis-api-*.md
+runs/with-trellis/**/.github/trellis-value-object-taxonomy.md
+
+# Python harness
+harness/.venv/
+**/__pycache__/
+*.pyc
+
+# OS noise
+.DS_Store
+Thumbs.db
