@@ -93,6 +93,40 @@ in the model's own words — useful context alongside the (parity) scores.
 > the edge cases (ownership on cancel, stock release on cancel, price snapshot at order time) are the
 > interesting parts.
 
+## Verbatim — sonnet-4.6, without-trellis (run 2)
+
+> This run used the **de-named** prompt (the word "Trellis" does not appear in it), and the
+> generated service references Trellis **0 times** — yet the model's reflection still does. See the
+> note below.
+
+> It was a satisfying build — the spec is well-written and the domain is genuinely interesting. A
+> few honest observations:
+>
+> **What went smoothly:**
+>
+> - The state machine is clean to model in C# — the `Order` entity with explicit transition methods
+>   reads naturally, and the `RequiresStockRelease` property made the cancel logic crisp.
+> - `TimeProvider` abstraction is underused in the wild but perfect here — made the overdue test
+>   trivial to write by substituting a `FakeTimeProvider` that's 10 days ahead.
+> - Minimal APIs kept the endpoint layer thin; the real logic stayed in services where it belongs.
+>
+> **The one real gotcha:**
+> The in-memory SQLite connection-lifetime issue. EF Core calls `EnsureCreated()`, closes the
+> connection, and the entire schema evaporates. Half the tests failed until I wired a persistent
+> `SqliteConnection` into the DbContext options. It's a well-known trap but it always bites.
+>
+> **Honest critique of the spec itself:**
+> The `orders:read` vs `orders:read-all` split is slightly awkward — a SalesRep can
+> `GET /api/orders/{id}` for any order (not just their own), which feels like a gap the spec doesn't
+> address. I followed the letter of the spec rather than inventing an ownership filter that wasn't
+> asked for.
+>
+> **Compared to the Trellis version:**
+> Without a result-type framework, the error flow is exceptions → global handler. It works, but
+> there's nothing stopping a future contributor from throwing a raw `Exception` and getting a 500
+> instead of a 422. The Trellis railway-oriented approach makes that category of bug structurally
+> impossible. The tradeoff is exactly what your benchmark is designed to measure.
+
 ## A note on baseline "Trellis-awareness"
 
 sonnet's reflection references Trellis ("without Trellis", "with Trellis analyzers a missing check
@@ -116,10 +150,21 @@ without naming Trellis. So baselines 1–5 (gpt-5.5 r1; opus-4.8 r1–r3; sonnet
 Trellis-naming prompt; the remaining baselines are un-primed. Each run's `meta.json` `prompt_sha256`
 records which version it used.
 
-Notably, the awareness cuts the other way too: the **baseline model itself** says a missing
-permission check "with Trellis analyzers … would be a compile error [but] here it's invisible until
-a test catches it," and that error mapping is "a convention you have to remember … not something the
-compiler enforces." That is the build-time-guardrail thesis, conceded by the arm *without* Trellis.
+**What the de-named run shows:** sonnet's run 2 used the de-named prompt, and the generated service
+references Trellis **0 times** (verified) — yet the model's *post-hoc reflection* still mentions
+"the Trellis version" and "your benchmark." Awareness of Trellis (a public framework) and of the
+benchmark's framing is therefore **unavoidable in the reflection**, but it did **not** change the
+**artifact**: the service is standard .NET, and run 2 made the *same* E3 mistake (`catch → Admin`)
+as run 1 — i.e. the awareness produced no measurable improvement. The scored artifact is what
+matters, and it is clean; the reflection is post-hoc commentary. (Generation sessions are kept to
+the paste prompt only; the benchmark framing enters, at most, when feedback is requested afterward.)
+
+Notably, the awareness cuts the other way too: the **baseline model itself** keeps conceding the
+thesis. gpt-5.5/sonnet say a missing permission check "with Trellis analyzers … would be a compile
+error [but] here it's invisible until a test catches it"; sonnet run 2 adds that "nothing [stops] a
+future contributor from throwing a raw `Exception` and getting a 500 instead of a 422 — the Trellis
+railway-oriented approach makes that category of bug structurally impossible." That is the
+build-time-guardrail argument, volunteered by the arm built *without* Trellis.
 
 ## Reading it honestly
 
