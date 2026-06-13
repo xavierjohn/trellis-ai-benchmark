@@ -1,0 +1,11 @@
+namespace OrderManagement.Api.Domain;
+
+public enum OrderStatus
+{
+    Draft,
+    Submitted,
+    Approved,
+    Shipped,
+    Delivered,
+    Cancelled
+}

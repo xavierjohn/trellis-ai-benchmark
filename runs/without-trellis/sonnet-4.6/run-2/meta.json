@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "sonnet-4.6",
   "run": 2,
-  "generated_at": "",
+  "generated_at": "2026-06-13T06:29:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 4600000,
+    "input_cached": 4400000,
+    "input_cache_write": 203700,
+    "output": 55800,
+    "output_reasoning": 3300,
+    "total": 4655800
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch; 29/30 -- E3 FAIL: ActorMiddleware catch{} -> Actor.DefaultAdmin on a malformed X-Test-Actor = silent elevation (same as r1; sonnet E3 = 2/2 fail). FIRST run with the DE-NAMED baseline prompt -- the service mentions Trellis 0 times."
 }
