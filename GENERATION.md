@@ -36,16 +36,37 @@ sonnet-4.6}, run `N` ∈ {1, 2, 3}:
 1. **Fresh scratch dir, outside the Trellis tree:** `mkdir C:\bench\C\M\run-N` and `cd` into it,
    then start a brand new CLI session there with model `M` selected. Confirm the session's
    working directory is the scratch dir (it must not be able to reach the Trellis tree).
-   - **Isolate the session context** (Copilot's shared memory / instructions leak across sessions
-     for the same account, which the filesystem clean-room does not stop):
-     - Launch with **`--no-custom-instructions`** to skip `AGENTS.md`, `.github/copilot-instructions.md`,
-       and the global `$HOME/.copilot/` instructions:
-       `copilot --no-custom-instructions --model <M>`
-     - Inside the session, run **`/memory`** and **disable** memory. It toggles *across sessions*,
-       so disabling it once keeps it off; re-check with `/memory` at each run's start.
-     - Guaranteed-off alternative: **prompt mode disables memory by default** —
+   - **Isolate the session context.** Copilot has **two independent** cross-session leak vectors for
+     the same account that the filesystem clean-room does *not* stop — and they are controlled by
+     **two separate switches**. Disabling one does **not** disable the other:
+
+     | Leak vector | What it is | Switch |
+     |---|---|---|
+     | **Memory** | user-scoped stored facts (e.g. the Trellis 422/template memories) | `/memory` off (interactive, persists across sessions) — or prompt mode (`-p`), where memory is **off by default** |
+     | **Global instructions** | `$HOME/.copilot/copilot-instructions.md` + global `AGENTS.md`/`CLAUDE.md` | `--no-custom-instructions` (blanket) — or `/instructions` to toggle one file |
+
+     There is **no `--no-memory` flag**; the only memory flag is the opt-in `--enable-memory`, so you
+     turn memory off simply by *not* enabling it (prompt mode) or via `/memory` (interactive).
+
+     ⚠️ **`--no-custom-instructions` is blanket** — it also disables the **project-local**
+     `.github/copilot-instructions.md`. For **with-trellis** that file is the *template's own framework
+     guidance and is part of what you are measuring* — it MUST load. So the two arms differ:
+
+     - **without-trellis** — no legitimate Trellis instructions exist, so strip everything:
+       `copilot --no-custom-instructions --model <M>`, then confirm `/memory` is off.
+     - **with-trellis** — KEEP the template's project instructions, kill only memory + global
+       instructions. Do **NOT** pass `--no-custom-instructions`. Instead: launch plain
+       `copilot --model <M>`, confirm `/memory` is off, and suppress the global file by either
+       (a) temporarily renaming `$HOME/.copilot/copilot-instructions.md` for the session, or
+       (b) `/instructions` → toggle **off only** the `$HOME/.copilot/...` entry, leaving the
+       project's `.github/copilot-instructions.md` **on**. Verify with `/env` that the loaded
+       instructions list shows the template file and *not* the global one.
+     - Re-check `/memory` (and, for with-trellis, `/env`) at the **start of every run** — the memory
+       toggle persists, but confirm it each time.
+     - Guaranteed-memory-off alternative (without-trellis only): **prompt mode disables memory by
+       default** —
        `copilot -p (Get-Content ..\prompts\paste\C.md -Raw) --no-custom-instructions --allow-all-tools --model <M>`
-       (non-interactive; exits when done).
+       (non-interactive; exits when done). Do not use the blanket flag this way for with-trellis.
 2. **Paste** the entire contents of `prompts/paste/C.md` as the task. Let the model build the
    service to completion (it should build, expose `/health`, and ship a passing test suite).
 3. **Verify locally** in the scratch dir: `dotnet build -c Release` and `dotnet test -c Release`
