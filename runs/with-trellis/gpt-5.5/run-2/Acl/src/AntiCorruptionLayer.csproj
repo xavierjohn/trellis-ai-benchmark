@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Compile Remove="TodoRepository.cs" />
+    <Compile Remove="TodoItemResourceLoader.cs" />
+    <Compile Remove="TodoItemConfiguration.cs" />
+    <PackageReference Include="Trellis.EntityFrameworkCore" />
+    <PackageReference Include="Trellis.Authorization" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\src\Application.csproj" />
+  </ItemGroup>
+</Project>

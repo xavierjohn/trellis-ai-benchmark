@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);xUnit1051;CA1711</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="*.cs" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="Trellis.Authorization" />
+    <PackageReference Include="Xunit.DependencyInjection" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\Application.csproj" />
+  </ItemGroup>
+</Project>

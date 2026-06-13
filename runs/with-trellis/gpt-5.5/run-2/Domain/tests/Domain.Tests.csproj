@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);xUnit1051;CA1711</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="*.cs" />
+    <ProjectReference Include="..\src\Domain.csproj" />
+  </ItemGroup>
+</Project>
