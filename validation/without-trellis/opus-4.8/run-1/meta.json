@@ -1,0 +1,23 @@
+{
+  "condition": "without-trellis",
+  "model": "opus-4.8",
+  "run": 1,
+  "role": "contamination-control",
+  "generated_at": "",
+  "prompt": "prompts/paste/without-trellis.md",
+  "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
+  "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
+  "template": null,
+  "trellis_packages": null,
+  "dotnet_sdk": "10.0.301",
+  "tokens": {
+    "input": null,
+    "input_cached": null,
+    "input_cache_write": null,
+    "output": null,
+    "output_reasoning": null,
+    "total": null
+  },
+  "generator": "manual clean-room",
+  "notes": "CONTAMINATION CONTROL (not in the headline 3-run aggregate; lives under validation/ which aggregate.py does not glob). Memory-DISABLED clean repeat of the without-trellis x opus-4.8 cell, whose headline runs r1-r3 were all generated memory-ON. Baseline arm: launch with --no-custom-instructions (blanket is safe -- no legitimate Trellis instructions exist) AND memory off. Purpose: confirm a fully clean generation reproduces the cell's contaminated headline score (29,29,30; E3 fails 2/3). WATCH E3: opus's malformed-X-Test-Actor -> admin elevation is model-intrinsic (catch -> Actor.DefaultAdmin()), not memory-driven, so it should persist clean -- evidence the E3 bug is the model's, not a contamination artifact. Generated on the current 422-spec (rubric-neutral)."
+}

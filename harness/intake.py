@@ -2,9 +2,14 @@
 
 Usage:
   python intake.py <scratch_dir> --condition with-trellis --model opus-4.8 --run 1
+  python intake.py <scratch_dir> --condition with-trellis --model gpt-5.5 --run 1 --root validation
 
 Copies source only (skips bin/obj/.git/.vs/*.db and the like) and preserves the slot's
 existing meta.json. The generated code is otherwise copied verbatim — never edit it.
+
+--root defaults to 'runs' (the headline 3-run matrix, runs 1-3). Use --root validation for
+memory-clean contamination-control re-runs that must stay OUT of the headline aggregate
+(aggregate.py only globs runs/**), so they never distort a cell's 3-run average.
 """
 
 from __future__ import annotations
@@ -28,14 +33,22 @@ def main():
     ap.add_argument("scratch_dir")
     ap.add_argument("--condition", required=True, choices=sorted(CONDITIONS))
     ap.add_argument("--model", required=True, choices=sorted(MODELS))
-    ap.add_argument("--run", required=True, type=int, choices=[1, 2, 3])
+    ap.add_argument("--run", required=True, type=int)
+    ap.add_argument("--root", default="runs",
+                    help="destination root under the repo (default: runs; use 'validation' "
+                         "for contamination-control runs kept out of the headline aggregate)")
     ap.add_argument("--force", action="store_true", help="overwrite existing source in the slot")
     args = ap.parse_args()
+
+    if args.run < 1:
+        ap.error("--run must be >= 1")
+    if args.root == "runs" and args.run not in (1, 2, 3):
+        ap.error("--run must be 1, 2, or 3 for the headline 'runs' root")
 
     src = Path(args.scratch_dir).resolve()
     if not src.is_dir():
         ap.error(f"scratch dir not found: {src}")
-    dest = REPO / "runs" / args.condition / args.model / f"run-{args.run}"
+    dest = REPO / args.root / args.condition / args.model / f"run-{args.run}"
     dest.mkdir(parents=True, exist_ok=True)
 
     existing = [p for p in dest.iterdir() if p.name not in SKIP_NAMES]
@@ -61,7 +74,7 @@ def main():
         gk.unlink()
     print(f"Copied {copied} file(s) -> {dest.relative_to(REPO)}")
     print("Next: fill generated_at/notes in that slot's meta.json, then run:")
-    print(f"  python run_all.py ../runs/{args.condition}/{args.model}/run-{args.run}")
+    print(f"  python run_all.py ../{args.root}/{args.condition}/{args.model}/run-{args.run}")
 
 
 if __name__ == "__main__":
