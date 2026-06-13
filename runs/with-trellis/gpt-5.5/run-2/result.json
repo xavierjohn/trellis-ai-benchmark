@@ -2,7 +2,7 @@
   "condition": "with-trellis",
   "model": "gpt-5.5",
   "run": 2,
-  "evaluated_at": "2026-06-13T01:20:06.811035+00:00",
+  "evaluated_at": "2026-06-13T02:16:46.419986+00:00",
   "api_version": "2026-11-12",
   "score": {
     "passed": 30,
@@ -12,7 +12,7 @@
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "trellis\\gpt-5.5\\run-2\\Application\\tests\\bin\\Release\\net10.0\\Application.Tests.dll\n  AntiCorruptionLayer.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Acl\\tests\\bin\\Release\\net10.0\\AntiCorruptionLayer.Tests.dll\n  Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Api\\src\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  Api.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Api\\tests\\bin\\Release\\net10.0\\Api.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:02.85"
+      "evidence": "gpt-5.5\\run-2\\Acl\\src\\bin\\Release\\net10.0\\OrderManagement.AntiCorruptionLayer.dll\n  AntiCorruptionLayer.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Acl\\tests\\bin\\Release\\net10.0\\AntiCorruptionLayer.Tests.dll\n  Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Api\\src\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  Api.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-2\\Api\\tests\\bin\\Release\\net10.0\\Api.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.78"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/019ebe90-58b9-7c6d-bbd3-ca06c812dbdf?api-version=2026-11-12'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/019ebec4-40bf-7ac3-9e68-0d4ada55ac76?api-version=2026-11-12'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/019ebe90-5934-7735-9e45-e53428c6bb09?api-version=2026-11-12'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/019ebec4-414f-7b25-8f67-8c3ec654f302?api-version=2026-11-12'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/019ebe90-59bf-771e-a5c8-46d8d34d3427?api-version=2026-11-12'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/019ebec4-41bc-7a7e-bb28-53cd049792b6?api-version=2026-11-12'"
     },
     "B4": {
       "pass": 1,

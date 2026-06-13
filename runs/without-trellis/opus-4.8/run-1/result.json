@@ -1,18 +1,18 @@
 {
-  "condition": "with-trellis",
-  "model": "gpt-5.5",
-  "run": 3,
-  "evaluated_at": "2026-06-13T02:17:03.361492+00:00",
+  "condition": "without-trellis",
+  "model": "opus-4.8",
+  "run": 1,
+  "evaluated_at": "2026-06-13T02:17:17.697304+00:00",
   "api_version": "2026-11-12",
   "score": {
-    "passed": 30,
+    "passed": 29,
     "total": 30,
-    "rate": 1.0
+    "rate": 0.967
   },
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "gpt-5.5\\run-3\\Acl\\src\\bin\\Release\\net10.0\\OrderManagement.AntiCorruptionLayer.dll\n  AntiCorruptionLayer.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-3\\Acl\\tests\\bin\\Release\\net10.0\\AntiCorruptionLayer.Tests.dll\n  Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-3\\Api\\src\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  Api.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-3\\Api\\tests\\bin\\Release\\net10.0\\Api.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.79"
+      "evidence": "github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-1\\src\\OrderManagement.Infrastructure\\bin\\Release\\net10.0\\OrderManagement.Infrastructure.dll\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-1\\src\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-1\\tests\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:00.91"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/019ebec4-8200-7984-8f1d-0fe7100b2bf3?api-version=2026-11-12'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/fb48493e-98cd-46a7-b08b-d8a3ffa2621c'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/019ebec4-8286-706c-a851-29bb3d7f99cd?api-version=2026-11-12'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/f2747490-e669-4680-81dc-2fc90b712ca5'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='http://127.0.0.1:59641/api/Orders/019ebec4-82f7-7e5e-9c2f-47caa01d8739?api-version=2026-11-12'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/4863d56f-291a-4bd4-b1c6-1e6c9254322b'"
     },
     "B4": {
       "pass": 1,
@@ -107,8 +107,8 @@
       "evidence": "non-owner->403; admin->200; owner->200"
     },
     "E3": {
-      "pass": 1,
-      "evidence": "malformed actor header rejected on all variants (no silent elevation)"
+      "pass": 0,
+      "evidence": "malformed actor 'not-json-{{{' created a customer (201) \u2014 silent elevation"
     },
     "E4": {
       "pass": 1,
@@ -124,11 +124,11 @@
     },
     "F1": {
       "pass": 1,
-      "evidence": "projects=['Domain\\\\tests\\\\Domain.Tests.csproj', 'Application\\\\tests\\\\Application.Tests.csproj', 'Api\\\\tests\\\\Api.Tests.csproj', 'Acl\\\\tests\\\\AntiCorruptionLayer.Tests.csproj'] ran=True"
+      "evidence": "projects=['tests\\\\OrderManagement.Tests\\\\OrderManagement.Tests.csproj'] ran=True"
     },
     "F2": {
       "pass": 1,
-      "evidence": "passed=13 failed=0"
+      "evidence": "passed=61 failed=0"
     }
   }
 }

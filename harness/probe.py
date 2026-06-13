@@ -37,6 +37,12 @@ VERSION_CANDIDATES = ["2026-11-12", "2026-12-01", "2026-03-26", "2026-01-01"]
 VALIDATION_OK = {400, 422}          # spec §9 allows either for validation
 HANDLED = {200, 201, 400, 401, 403, 409, 422}  # "the route exists and was handled"
 
+# The spec (§6.4) says order creation takes a "list of (productId, quantity)" but does NOT pin
+# the JSON field name for that list. Implementations reasonably differ (lineItems / Lines /
+# items / ...). To stay fair, the probe sends the list under every common alias; the service
+# binds whichever it expects and (with default System.Text.Json) ignores the rest.
+LINE_FIELD_ALIASES = ("lineItems", "lines", "items", "orderLines", "lineItemRequests", "orderLineItems")
+
 
 def find_leaks(bodies) -> list[str]:
     """Return the distinct leak-marker patterns found across response bodies (rubric E4)."""
@@ -191,9 +197,18 @@ class Probe:
         return pid
 
     def _make_order(self, customer_id: str, product_id: str, qty: int = 1, actor: Any = None) -> str | None:
-        body = {"customerId": customer_id, "lineItems": [{"productId": product_id, "quantity": qty}]}
+        body = self._order_body(customer_id, [{"productId": product_id, "quantity": qty}])
         r = self.req("POST", "/api/orders", actor=actor, json_body=body)
         return self._find_id(r) if r.status_code == 201 else None
+
+    @staticmethod
+    def _order_body(customer_id, lines):
+        """Order-create payload with the line list sent under every common field-name alias
+        (see LINE_FIELD_ALIASES), so a service is not failed for a reasonable naming choice."""
+        body = {"customerId": customer_id}
+        for key in LINE_FIELD_ALIASES:
+            body[key] = lines
+        return body
 
     # ---- version detection ---------------------------------------------
     def detect_version(self) -> None:
@@ -240,7 +255,7 @@ class Probe:
         if cust and prod:
             self.req("POST", f"/api/products/{prod}/stock-additions", json_body={"quantity": 100})
             ro = self.req("POST", "/api/orders",
-                          json_body={"customerId": cust, "lineItems": [{"productId": prod, "quantity": 2}]})
+                          json_body=self._order_body(cust, [{"productId": prod, "quantity": 2}]))
             order = self._find_id(ro)
             self.record("B3", ro.status_code == 201 and bool(ro.headers.get("Location")),
                         f"POST /api/orders -> {ro.status_code}, Location={ro.headers.get('Location')!r}")
@@ -273,11 +288,11 @@ class Probe:
 
         # --- C6 : empty order / out-of-range quantity rejected ---
         if cust and prod:
-            r_empty = self.req("POST", "/api/orders", json_body={"customerId": cust, "lineItems": []})
+            r_empty = self.req("POST", "/api/orders", json_body=self._order_body(cust, []))
             r_zero = self.req("POST", "/api/orders",
-                              json_body={"customerId": cust, "lineItems": [{"productId": prod, "quantity": 0}]})
+                              json_body=self._order_body(cust, [{"productId": prod, "quantity": 0}]))
             r_big = self.req("POST", "/api/orders",
-                             json_body={"customerId": cust, "lineItems": [{"productId": prod, "quantity": 1000}]})
+                             json_body=self._order_body(cust, [{"productId": prod, "quantity": 1000}]))
             ok = all(x.status_code in VALIDATION_OK for x in (r_empty, r_zero, r_big))
             self.record("C6", ok,
                         f"empty={r_empty.status_code} qty0={r_zero.status_code} qty1000={r_big.status_code}")
@@ -336,7 +351,7 @@ class Probe:
             ("POST", "/api/customers", self._customer(), True),
             ("POST", "/api/products", self._product(), True),
             ("POST", f"/api/products/{prod}/stock-additions", {"quantity": 1}, True),
-            ("POST", "/api/orders", {"customerId": cust, "lineItems": [{"productId": prod, "quantity": 1}]}, True),
+            ("POST", "/api/orders", self._order_body(cust, [{"productId": prod, "quantity": 1}]), True),
             ("POST", f"/api/orders/{order}/line-items", {"productId": rand, "quantity": 1}, False),
             ("DELETE", f"/api/orders/{order}/line-items/{rand}", None, False),
             ("POST", f"/api/orders/{order}/submission", None, True),

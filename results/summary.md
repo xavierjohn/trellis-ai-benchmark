@@ -1,6 +1,6 @@
 # Headline results
 
-_Generated 2026-06-13 01:40 UTC from 4 run(s)._
+_Generated 2026-06-13 02:18 UTC from 5 run(s)._
 
 Each cell is the **mean pass rate over the 30 neutral criteria**, averaged across runs.
 Higher is better. Δ is the with-Trellis advantage in percentage points.
@@ -8,9 +8,9 @@ Higher is better. Δ is the with-Trellis advantage in percentage points.
 | Model | Without Trellis | With Trellis | Δ (pts) |
 |---|---|---|---|
 | gpt-5.5 | 100% | 100% | +0 |
-| opus-4.8 | — | — | — |
+| opus-4.8 | 97% | — | — |
 | sonnet-4.6 | — | — | — |
-| **All models** | **100%** | **100%** | **+0** |
+| **All models** | **98%** | **100%** | **+2** |
 
 ### Generation cost (tokens per service)
 
