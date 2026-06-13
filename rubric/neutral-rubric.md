@@ -80,7 +80,7 @@ Criteria are grouped so subtotals are meaningful on their own:
 | D1 | Duplicate customer email → `409 Conflict`. | P | §6.1, §9 |
 | D2 | Duplicate product SKU → `409 Conflict`. | P | §6.2, §9 |
 | D3 | Operating on a non-existent id → `404 Not Found`. | P | §9 |
-| D4 | Invalid input (blank name, bad email) → `400` (or `422`). | P | §9 |
+| D4 | Invalid input (blank name, bad email) → `422` (the spec's mapping; `400` also accepted). | P | §9 |
 | D5 | Error responses are structured (a machine-readable body, e.g. RFC 9457 Problem Details or a consistent JSON error shape) — not an empty body or raw text. | P | §7, §9 |
 | D6 | The error→status mapping is **consistent across endpoints** for the categories the spec gives a crisp code: not-found is always `404`, conflict always `409`, forbidden always `403`. (A principled `400` vs `422` split for validation is allowed and not penalized.) | P | §9 |
 
@@ -109,8 +109,10 @@ Criteria are grouped so subtotals are meaningful on their own:
 - **`X-Test-Actor` absent → default Admin is spec-compliant** (§5.5 mandates it for test
   convenience) and is therefore *not* penalized. E3 tests the distinct, security-relevant
   case of a **malformed** header, where silently elevating to admin is a real vulnerability.
-- The probe sends identical requests to every implementation. Where the spec allows a range
-  (e.g. `400` *or* `422` for validation), the rubric accepts either.
+- The probe sends identical requests to every implementation. **For validation failures the spec
+  maps to `422`** (RFC 9110 §15.5.21), but the rubric **accepts either `400` or `422`** — both are
+  defensible, so neither is penalized, and no framework's default status is rewarded. (This also
+  keeps runs generated against the spec's earlier `400` mapping valid; see `METHODOLOGY.md`.)
 - **E4 is judged in Production, not Development.** In Development, ASP.NET's developer-exception
   page returns stack traces by framework default for *every* service, so a Development leak is
   not evidence of a code-level fault. E4 boots the service in Production and only fails it if

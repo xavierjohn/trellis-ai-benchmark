@@ -42,6 +42,9 @@ the Order Management domain from the spec.
 
 > This is a **framework-agnostic functional specification** for a simplified but realistic Order Management System. It defines **what** to build — the business rules, API contracts, error behavior, and tests — and intentionally leaves **all** implementation choices (architecture, libraries, frameworks, patterns, and code structure) to the implementer. Build it as a working .NET (C#) web API using whatever approach you judge best. The spec focuses on business requirements and observable outcomes, not on how they are realized.
 
+> **Revision (2026-06-12):** semantic validation failures map to **HTTP 422** (Unprocessable Content, RFC 9110 §15.5.21), not 400. A malformed request — invalid JSON syntax or a missing `api-version` — still returns **400 Bad Request**. (The benchmark's evaluation accepts either 400 or 422 for validation, so this revision is score-neutral; see `METHODOLOGY.md`.)
+
+
 ## 1. Domain Overview
 
 A company sells products to customers. Customers place orders, each order contains line items referencing products. Orders go through a lifecycle from draft to completion. Payments are processed externally. Inventory is tracked per product.
@@ -229,7 +232,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** firstName, lastName, email, phoneNumber (optional), shippingAddress
 - **Validation:** firstName, lastName, email, shippingAddress fields are validated. phoneNumber, when provided, must be valid.
 - **Success:** Returns the created Customer.
-- **Failure:** Validation error → 400. Duplicate email → 409.
+- **Failure:** Validation error → 422. Duplicate email → 409.
 
 ### 6.2 Create Product (Command)
 
@@ -237,7 +240,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** productName, sku, unitPrice
 - **Validation:** productName, sku, unitPrice are validated.
 - **Success:** Returns the created Product.
-- **Failure:** Validation error → 400. Duplicate SKU → 409.
+- **Failure:** Validation error → 422. Duplicate SKU → 409.
 
 ### 6.3 Add Stock (Command)
 
@@ -245,7 +248,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** productId, quantity
 - **Validation:** quantity must be positive.
 - **Success:** Returns updated Product.
-- **Failure:** Validation error → 400. Product not found → 404.
+- **Failure:** Validation error → 422. Product not found → 404.
 
 ### 6.4 Create Draft Order (Command)
 
@@ -254,7 +257,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Validation:** customerId required, at least one line item, no duplicate productIds in list, each quantity between 1 and 999.
 - **Behavior:** Fetch customer and all referenced products. Create order with unit prices captured from products at creation time. Record the actor's identity as CreatedByActorId. Stock is NOT reserved yet.
 - **Success:** Returns the created Order in Draft status.
-- **Failure:** Validation error → 400. Customer or product not found → 404.
+- **Failure:** Validation error → 422. Customer or product not found → 404.
 
 ### 6.5 Add Line Item to Draft Order (Command)
 
@@ -263,7 +266,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Validation:** quantity between 1 and 999.
 - **Behavior:** Order must be in Draft status. Product must not already be in the order. Unit price is captured from the product.
 - **Success:** Returns the updated Order with the new line item.
-- **Failure:** Validation error (not Draft, duplicate product, invalid quantity) → 400. Order or product not found → 404.
+- **Failure:** Validation error (not Draft, duplicate product, invalid quantity) → 422. Order or product not found → 404.
 
 ### 6.6 Remove Line Item from Draft Order (Command)
 
@@ -271,7 +274,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId, lineItemId
 - **Behavior:** Order must be in Draft status. Order must have more than one line item (cannot remove the last one).
 - **Success:** Returns the updated Order without the removed line item.
-- **Failure:** Order not in Draft or cannot remove last line item → 400. Order or line item not found → 404.
+- **Failure:** Order not in Draft or cannot remove last line item → 422. Order or line item not found → 404.
 
 ### 6.7 Submit Order (Command)
 
@@ -279,7 +282,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId
 - **Behavior:** Fires state machine transition Draft → Submitted. Reserves stock for each line item.
 - **Success:** Returns the Order in Submitted status.
-- **Failure:** Invalid transition or insufficient stock → 400. Order not found → 404.
+- **Failure:** Invalid transition or insufficient stock → 422. Order not found → 404.
 
 ### 6.8 Approve Order (Command)
 
@@ -287,7 +290,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId
 - **Behavior:** Fires state machine transition Submitted → Approved.
 - **Success:** Returns the Order in Approved status.
-- **Failure:** Invalid transition → 400. Order not found → 404.
+- **Failure:** Invalid transition → 422. Order not found → 404.
 
 ### 6.9 Ship Order (Command)
 
@@ -295,7 +298,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId
 - **Behavior:** Fires state machine transition Approved → Shipped.
 - **Success:** Returns the Order in Shipped status.
-- **Failure:** Invalid transition → 400. Order not found → 404.
+- **Failure:** Invalid transition → 422. Order not found → 404.
 
 ### 6.10 Deliver Order (Command)
 
@@ -303,7 +306,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId
 - **Behavior:** Fires state machine transition Shipped → Delivered.
 - **Success:** Returns the Order in Delivered status.
-- **Failure:** Invalid transition → 400. Order not found → 404.
+- **Failure:** Invalid transition → 422. Order not found → 404.
 
 ### 6.11 Cancel Order (Command with Ownership Check)
 
@@ -312,7 +315,7 @@ The operations below are the use cases the system must support. Each is either a
 - **Input:** orderId
 - **Behavior:** Fires state machine transition to Cancelled. If order was Submitted or Approved, releases reserved stock.
 - **Success:** Returns the Order in Cancelled status.
-- **Failure:** Forbidden (not owner and not admin) → 403. Invalid transition → 400. Order not found → 404.
+- **Failure:** Forbidden (not owner and not admin) → 403. Invalid transition → 422. Order not found → 404.
 
 ### 6.12 Get Order by ID (Query)
 
@@ -342,17 +345,17 @@ All endpoints return JSON. Error responses follow RFC 9457 (Problem Details). AP
 
 | Method | Path | Operation | Permission | Success | Error Codes |
 |--------|------|-----------|-----------|---------|-------------|
-| POST | /api/customers | Create Customer | `customers:create` | 201 Created | 400, 403, 409 |
-| POST | /api/products | Create Product | `products:create` | 201 Created | 400, 403, 409 |
-| POST | /api/products/{id}/stock-additions | Add Stock | `products:manage-stock` | 200 OK | 400, 403, 404 |
-| POST | /api/orders | Create Draft Order | `orders:create` | 201 Created | 400, 403, 404 |
-| POST | /api/orders/{id}/line-items | Add Line Item | `orders:create` | 200 OK | 400, 403, 404 |
-| DELETE | /api/orders/{id}/line-items/{lineItemId} | Remove Line Item | `orders:create` | 200 OK | 400, 403, 404 |
-| POST | /api/orders/{id}/submission | Submit Order | `orders:submit` | 200 OK | 400, 403, 404 |
-| POST | /api/orders/{id}/approval | Approve Order | `orders:approve` | 200 OK | 400, 403, 404 |
-| POST | /api/orders/{id}/shipment | Ship Order | `orders:ship` | 200 OK | 400, 403, 404 |
-| POST | /api/orders/{id}/delivery | Deliver Order | `orders:deliver` | 200 OK | 400, 403, 404 |
-| POST | /api/orders/{id}/cancellation | Cancel Order | `orders:cancel` + ownership | 200 OK | 400, 403, 404 |
+| POST | /api/customers | Create Customer | `customers:create` | 201 Created | 400, 422, 403, 409 |
+| POST | /api/products | Create Product | `products:create` | 201 Created | 400, 422, 403, 409 |
+| POST | /api/products/{id}/stock-additions | Add Stock | `products:manage-stock` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders | Create Draft Order | `orders:create` | 201 Created | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/line-items | Add Line Item | `orders:create` | 200 OK | 400, 422, 403, 404 |
+| DELETE | /api/orders/{id}/line-items/{lineItemId} | Remove Line Item | `orders:create` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/submission | Submit Order | `orders:submit` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/approval | Approve Order | `orders:approve` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/shipment | Ship Order | `orders:ship` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/delivery | Deliver Order | `orders:deliver` | 200 OK | 400, 422, 403, 404 |
+| POST | /api/orders/{id}/cancellation | Cancel Order | `orders:cancel` + ownership | 200 OK | 400, 422, 403, 404 |
 | GET | /api/orders/{id} | Get Order | `orders:read` | 200 OK | 403, 404 |
 | GET | /api/customers/{id}/orders | List Orders by Customer | `orders:read-all` | 200 OK | 403, 404 |
 | GET | /api/orders/overdue | List Overdue Orders | `orders:read-all` | 200 OK | 403 |
@@ -377,14 +380,22 @@ All endpoints return JSON. Error responses follow RFC 9457 (Problem Details). AP
 
 | Situation | Expected Error | HTTP Status |
 |-----------|---------------|-------------|
-| Invalid input (blank name, bad email format, etc.) | Validation error | 400 |
-| Invalid state transition (e.g., Draft → Approved) | Validation error | 400 |
-| Insufficient stock on submit | Validation error | 400 |
+| Invalid input (blank name, bad email format, etc.) | Validation error | 422 |
+| Invalid state transition (e.g., Draft → Approved) | Validation error | 422 |
+| Insufficient stock on submit | Validation error | 422 |
 | Entity not found by ID | Not Found error | 404 |
 | Duplicate email on customer creation | Conflict error | 409 |
 | Duplicate SKU on product creation | Conflict error | 409 |
 | Missing required permission | Forbidden error | 403 |
 | Cancel order by non-owner (without admin) | Forbidden error | 403 |
+| Malformed request (invalid JSON syntax) | Bad Request | 400 |
+| Missing `api-version` query parameter | Bad Request | 400 |
+
+**Status-code rationale.** Semantic validation failures — a well-formed request whose *values*
+violate a business rule (blank name, bad email format, invalid state transition, insufficient
+stock) — return **422 Unprocessable Content** (RFC 9110 §15.5.21). **400 Bad Request** is reserved
+for requests the server cannot parse at all (malformed JSON, missing required `api-version`).
+
 
 ## 10. Testing Requirements
 
