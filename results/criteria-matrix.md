@@ -1,6 +1,6 @@
 # Per-criterion matrix
 
-_Generated 2026-06-13 03:15 UTC from 7 run(s)._
+_Generated 2026-06-13 03:55 UTC from 8 run(s)._
 
 Pass rate per criterion in each model × condition cell (averaged over runs).
 
@@ -30,7 +30,7 @@ Pass rate per criterion in each model × condition cell (averaged over runs).
 | `D6` Status mapping consistent (P) | 100% | 100% | — | 100% | 100% | — |
 | `E1` Missing permission -> 403 (P) | 100% | 100% | — | 100% | 100% | — |
 | `E2` Cancel ownership enforced (P) | 100% | 100% | — | 100% | 100% | — |
-| `E3` Malformed actor not elevated (P) | 100% | 0% | — | 100% | 0% | — |
+| `E3` Malformed actor not elevated (P) | 100% | 33% | — | 100% | 0% | — |
 | `E4` No stack/exception leak (in Production) (P) | 100% | 100% | — | 100% | — | — |
 | `E5` read-all enforced vs read-only (P) | 100% | 100% | — | 100% | 100% | — |
 | `E6` Empty-perm actor fully denied (P) | 100% | 100% | — | 100% | 100% | — |

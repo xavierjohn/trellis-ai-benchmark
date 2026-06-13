@@ -62,7 +62,7 @@ rubric/               the 30 outcome-only scoring criteria
 runs/                 the 18 raw generated services (+ per-run result.json)
 harness/              Python scorer: probe.py, static_checks.py, run_all.py, aggregate.py
 results/              generated headline + per-criterion tables
-findings/             qualitative, non-scored evidence (e.g. the generating model's own feedback)
+findings/             qualitative, non-scored evidence: model framework feedback + baseline self-assessments
 GENERATION.md         clean-room runbook for producing the 18 services
 METHODOLOGY.md        design, controls, and threats to validity
 ```
