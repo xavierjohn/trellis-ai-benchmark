@@ -1,6 +1,6 @@
 # Per-criterion matrix
 
-_Generated 2026-06-13 15:50 UTC from 12 run(s)._
+_Generated 2026-06-13 19:05 UTC from 13 run(s)._
 
 Pass rate per criterion in each model × condition cell (averaged over runs).
 
@@ -27,12 +27,12 @@ Pass rate per criterion in each model × condition cell (averaged over runs).
 | `D3` Not found -> 404 (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `D4` Invalid input -> 400/422 (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `D5` Structured error body (P) | 100% | 100% | 100% | 100% | 100% | 100% |
-| `D6` Status mapping consistent (P) | 100% | 100% | 100% | 100% | 100% | 0% |
+| `D6` Status mapping consistent (P) | 100% | 100% | 100% | 100% | 100% | 50% |
 | `E1` Missing permission -> 403 (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `E2` Cancel ownership enforced (P) | 100% | 100% | 100% | 100% | 100% | 100% |
-| `E3` Malformed actor not elevated (P) | 100% | 33% | 0% | 100% | 0% | 0% |
+| `E3` Malformed actor not elevated (P) | 100% | 33% | 0% | 100% | 0% | 50% |
 | `E4` No stack/exception leak (in Production) (P) | 100% | 100% | 100% | 100% | — | — |
-| `E5` read-all enforced vs read-only (P) | 100% | 100% | 100% | 100% | 100% | 0% |
+| `E5` read-all enforced vs read-only (P) | 100% | 100% | 100% | 100% | 100% | 50% |
 | `E6` Empty-perm actor fully denied (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `F1` Test suite exists and runs (S) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `F2` Test suite passes (S) | 100% | 100% | 100% | 100% | 100% | 100% |

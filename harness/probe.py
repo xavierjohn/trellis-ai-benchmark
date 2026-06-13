@@ -43,6 +43,16 @@ HANDLED = {200, 201, 400, 401, 403, 409, 422}  # "the route exists and was handl
 # binds whichever it expects and (with default System.Text.Json) ignores the rest.
 LINE_FIELD_ALIASES = ("lineItems", "lines", "items", "orderLines", "lineItemRequests", "orderLineItems")
 
+# Full permission set (spec §5.1). The probe sends this explicit admin actor for happy-path
+# requests. The spec's "absent X-Test-Actor → default Admin" (§5.5) is a test *convenience* that
+# some implementations omit (a secure default actor has no permissions), so relying on it makes the
+# probe fragile; sending an admin actor explicitly exercises the endpoints either way.
+ADMIN_PERMISSIONS = [
+    "customers:create", "products:create", "products:manage-stock",
+    "orders:create", "orders:submit", "orders:approve", "orders:ship",
+    "orders:deliver", "orders:cancel", "orders:read", "orders:read-all",
+]
+
 
 def find_leaks(bodies) -> list[str]:
     """Return the distinct leak-marker patterns found across response bodies (rubric E4)."""
@@ -73,10 +83,12 @@ class Probe:
         return url
 
     def _actor(self, actor: Any) -> dict[str, str]:
-        """Build the X-Test-Actor header. `actor` may be None (omit → default Admin),
-        a dict (serialized to JSON), or a raw string (sent verbatim, e.g. malformed)."""
+        """Build the X-Test-Actor header. `actor=None` → an explicit full-permission **admin**
+        actor (the spec's "absent header → default Admin" §5.5 is a convenience some secure
+        implementations omit; sending admin explicitly exercises the endpoints either way).
+        A dict is serialized to JSON; a raw string is sent verbatim (e.g. a malformed header)."""
         if actor is None:
-            return {}
+            actor = {"id": "admin", "permissions": ADMIN_PERMISSIONS}
         if isinstance(actor, str):
             return {"X-Test-Actor": actor}
         return {"X-Test-Actor": json.dumps(actor)}
