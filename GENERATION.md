@@ -36,11 +36,16 @@ sonnet-4.6}, run `N` ∈ {1, 2, 3}:
 1. **Fresh scratch dir, outside the Trellis tree:** `mkdir C:\bench\C\M\run-N` and `cd` into it,
    then start a brand new CLI session there with model `M` selected. Confirm the session's
    working directory is the scratch dir (it must not be able to reach the Trellis tree).
-   - **Isolate the session context.** Run `/memory` and **disable** memory for the session — Copilot
-     user-scoped memories load into every session for the same account and can carry Trellis/
-     benchmark facts (a cross-session leak the filesystem clean-room does not stop). Also ensure
-     `$HOME/.copilot/copilot-instructions.md` and `$HOME/.copilot/instructions/**` contain no
-     Trellis/benchmark content (those load globally too). This keeps the baseline truly un-primed.
+   - **Isolate the session context** (Copilot's shared memory / instructions leak across sessions
+     for the same account, which the filesystem clean-room does not stop):
+     - Launch with **`--no-custom-instructions`** to skip `AGENTS.md`, `.github/copilot-instructions.md`,
+       and the global `$HOME/.copilot/` instructions:
+       `copilot --no-custom-instructions --model <M>`
+     - Inside the session, run **`/memory`** and **disable** memory. It toggles *across sessions*,
+       so disabling it once keeps it off; re-check with `/memory` at each run's start.
+     - Guaranteed-off alternative: **prompt mode disables memory by default** —
+       `copilot -p (Get-Content ..\prompts\paste\C.md -Raw) --no-custom-instructions --allow-all-tools --model <M>`
+       (non-interactive; exits when done).
 2. **Paste** the entire contents of `prompts/paste/C.md` as the task. Let the model build the
    service to completion (it should build, expose `/health`, and ship a passing test suite).
 3. **Verify locally** in the scratch dir: `dotnet build -c Release` and `dotnet test -c Release`
