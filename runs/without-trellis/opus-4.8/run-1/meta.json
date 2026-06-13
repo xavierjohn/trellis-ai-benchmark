@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "opus-4.8",
   "run": 1,
-  "generated_at": "",
+  "generated_at": "2026-06-12T19:11:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "1280d5a4312d4bb789b455c1a4bb4faa196ad486f4170b15e284d6e30b86bf12",
   "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 7200000,
+    "input_cached": 7100000,
+    "input_cache_write": 107200,
+    "output": 72400,
+    "output_reasoning": 4200,
+    "total": 7272400
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch (layered src/Domain/Application/Infrastructure/Api, minimal APIs); 29/30 -- E3 FAIL: malformed X-Test-Actor parse is try/caught and falls through to Actor.DefaultAdmin() (all perms) = privilege escalation. Order payload field 'Lines'. 3.75x gpt-5.5's output tokens yet still shipped the security bug."
 }
