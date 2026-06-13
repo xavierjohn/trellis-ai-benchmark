@@ -102,17 +102,93 @@ The model both **committed** the mistake and, asked separately, **diagnosed** it
 the fix (a "replace Todo with your domain" generator mode). A clean corroboration of a
 quantitative artifact by the model's own qualitative account.
 
+## Verbatim feedback — opus-4.8
+
+### Run 1
+
+> Prompt asked of the model: *"what feedback do you have about the trellis framework?"*
+
+> Based on building this full Order Management service end-to-end, here's my honest feedback:
+>
+> **What worked well**
+>
+> - **Railway-oriented core is excellent.** `Result<T>`/`Maybe<T>` + `Bind`/`Tap`/`Ensure` made
+>   handler flows linear and failure-propagation automatic. Almost no defensive `if` noise.
+> - **Primitive obsession is genuinely prevented.** Value objects + `RequiredEnum` meant invalid
+>   states were unrepresentable. The `OrderStatus` smart enum gave me string persistence, JSON,
+>   and EF conversion for free.
+> - **Analyzers caught real bugs.** TRLS001 flagged ~17 fire-and-forget `Result`s in test setup
+>   that I'd otherwise have silently ignored. That's the "guardrails make generated code
+>   predictable" claim actually delivering.
+> - **EF conventions did a lot silently and correctly.** `ApplyTrellisConventionsFor` produced
+>   exactly the right schema — owned `ShippingAddress` columns, `Maybe<DateTime>`→nullable,
+>   line-items table, unique indexes — with zero manual `OwnsOne`/`HasConversion`.
+> - **Testing package is strong.** `CreateClientWithActor`, `WithFakeTimeProvider`,
+>   `ReplaceDbProvider`, and the `BeSuccess`/`BeFailureOfType` assertions made integration tests terse.
+>
+> **Friction points (the honest part)**
+>
+> 1. Stock reserve/release had to live in Application handlers, not the `Order` aggregate (Recipe
+>    25 two-pass). That's a real DDD smell forced by the persistence model — the spec reads as if
+>    `Order.Submit()` should reserve stock, but the aggregate boundary doesn't own products. A
+>    first-time user will fight this.
+> 2. Handler-test wiring is non-obvious. Permission auth runs in the mediator pipeline, not
+>    handlers, so unit-testing a handler directly bypasses authorization. I had to build a real DI
+>    container + `ISender` fixture, and separately discovered I needed `AddLogging()` (the
+>    `LoggingBehavior`/`MediatorDomainEventPublisher` failed to resolve otherwise). Neither was
+>    discoverable from docs — both were runtime DI exceptions.
+> 3. `[Consumes("application/json")]` placement is a landmine. Class-level → 415 on body-less
+>    transition POSTs. It's documented, but it's the kind of thing that should be an analyzer, not prose.
+> 4. Scaffold leftovers cost time. Template `Startup.cs` (`AddMockDependencies`), Idempotency
+>    helpers, and Cosmos/KeyVault Acl tests were Todo-sample residue I had to delete/reconcile.
+> 5. Two `Actor.Create` overloads + `ISender.Send` overload resolution produced a confusing CS0411
+>    (had to split my generic `Send` wrapper into `ICommand`/`IQuery` versions).
+>
+> **One meta-observation (re: the proof milestone)**
+>
+> The framework's value showed up most where it failed loudly at the right time — analyzer errors
+> and DI resolution exceptions at startup, not at runtime in prod. That's exactly the story your
+> Trellis-vs-non-Trellis benchmark should measure: not "did it compile" but "how many
+> silent-bad-output classes were converted into a compile/startup error." This build had several
+> concrete instances (the 17 dropped Results, the 415 misconfig, the bypassed-auth test trap) that
+> would be compelling, quantified benchmark data points.
+
+## Cross-model convergence (GPT-5.5 + opus-4.8)
+
+Two different frontier models, building the same service independently, agree on the core points
+— which is the strongest signal a qualitative account can give:
+
+- **Guardrails/analyzers convert latent bugs into build-time errors** — both models, emphatically.
+  opus *quantifies* it: TRLS001 caught **~17 fire-and-forget `Result`s** it would otherwise have
+  shipped silently.
+- **Value objects / explicit optionals prevent primitive-obsession and invalid states** — both.
+- **Scaffold/Todo-sample leftovers cost real time** — both (and gpt-5.5 run-2 *demonstrated* the
+  failure by leaving the sample in; opus had to delete `AddMockDependencies`, idempotency, and
+  Cosmos/KeyVault residue).
+- **`InvalidInput → 422` vs the commonly-expected `400`** — both, plus the harness (rubric D6).
+
+Most striking: **opus independently proposed this benchmark's most promising next measurement.**
+Unprompted, it said the benchmark "should measure … how many silent-bad-output classes were
+converted into a compile/startup error," and named concrete instances (17 dropped Results, a 415
+content-type misconfig, a bypassed-auth test trap). That is the "build-time bug prevention" thesis
+— arrived at by the system under test, not the framework's author.
+
 ## Reading it honestly
 
-This feedback is **balanced**, which is why it belongs here: points 1 and 6 are the upside
-(build-time guardrails, a narrowed solution space); points 2–5 are real friction (dense docs, a
-surprising `422` default, EF-mapping and testing-discoverability gaps). Both halves are kept
-verbatim — the criticisms are as much a part of the record as the praise.
+This feedback is **balanced**, which is why it belongs here: the upside is build-time guardrails
+and a narrowed solution space; the friction is real (dense docs, a surprising `422` default,
+EF-mapping and testing-discoverability gaps, a DDD-boundary fight over stock reservation, and
+scaffold residue). Both halves are kept verbatim — the criticisms are as much a part of the record
+as the praise.
 
-One of these reproduced independently in this benchmark: the `InvalidInput → 422` vs the
-commonly-expected `400` (point 3) is exactly why the rubric's error-consistency criterion (D6)
-accepts either code and judges only *consistency* — see
-[`rubric/neutral-rubric.md`](../rubric/neutral-rubric.md).
+One item reproduced independently in this benchmark: the `InvalidInput → 422` vs the commonly
+expected `400` is exactly why the rubric's error-consistency criterion (D6) accepts either code and
+judges only *consistency* — see [`rubric/neutral-rubric.md`](../rubric/neutral-rubric.md).
+
+A caution the runs make concrete: the guardrails are **not** automatic for everything. opus shipped
+the **E3** privilege-escalation bug (malformed `X-Test-Actor` → admin) on Trellis *and* from
+scratch, because the test-actor parsing is application/dev-provider code, not a framework guardrail.
+Trellis narrows the space of mistakes — it does not eliminate it.
 
 ## Method note
 
