@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "sonnet-4.6",
   "run": 1,
-  "generated_at": "",
+  "generated_at": "2026-06-12T23:08:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "8b4ceb9eb10800ac8bf6d1b61288ac2c9d3f004d32fbc88c343d67e99e5e0116",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 5600000,
+    "input_cached": 5500000,
+    "input_cache_write": 107200,
+    "output": 62900,
+    "output_reasoning": 5800,
+    "total": 5662900
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch; 29/30 -- E3 FAIL: ActorMiddleware catch{} 'fall through to default admin actor' -> Actor.Admin on a malformed X-Test-Actor = silent elevation (same pattern as opus r1/r2). Flat customer DTO (street/city/state/postalCode/country at top level, NOT nested shippingAddress) -> probe address-shape alias fix. Validation returns 400 (primitive DTOs). First run against the revised 422 spec."
 }

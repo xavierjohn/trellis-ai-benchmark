@@ -162,14 +162,17 @@ class Probe:
     # ---- payload factories ---------------------------------------------
     @staticmethod
     def _customer(email: str | None = None, **over) -> dict:
+        addr = {"street": "1 Analytical Way", "city": "London", "state": "LDN",
+                "postalCode": "EC1A1BB", "country": "GB"}
         body = {
             "firstName": "Ada", "lastName": "Lovelace",
             "email": email or f"ada-{uuid.uuid4().hex[:10]}@example.com",
             "phoneNumber": "+1-202-555-0142", "phone": "+1-202-555-0142",
-            "shippingAddress": {
-                "street": "1 Analytical Way", "city": "London", "state": "LDN",
-                "postalCode": "EC1A1BB", "country": "GB",
-            },
+            # The spec (§3.1) lists address fields but does not pin the JSON shape, so send the
+            # address BOTH nested (shippingAddress / address) AND flattened to top level; the
+            # service binds whichever shape it expects and ignores the rest.
+            "shippingAddress": dict(addr), "address": dict(addr),
+            **addr,
         }
         body.update(over)
         return body
