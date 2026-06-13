@@ -17,5 +17,5 @@
     "total": 6044400
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 13 tests (fewer than run-1's 40 despite more output tokens)"
+  "notes": "Trellis ASP template; 30/30 but LEFT the template Todo sample in place (Api/src/2026-03-26 & 2026-12-01 TodosController, Application/src/Todos, Acl/src/TodoRepository, Domain/tests/Todo*) alongside a correct OM impl at api 2026-11-12 -- incomplete 'replace the sample' cleanup; 82 .cs files vs run-1's 54; 13 tests"
 }
