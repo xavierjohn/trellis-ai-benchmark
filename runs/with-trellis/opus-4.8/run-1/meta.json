@@ -2,7 +2,7 @@
   "condition": "with-trellis",
   "model": "opus-4.8",
   "run": 1,
-  "generated_at": "",
+  "generated_at": "2026-06-12T20:00:00-07:00",
   "prompt": "prompts/paste/with-trellis.md",
   "prompt_sha256": "bc031b42d786c4f38c5a50d795d0024493f254a9350f10d8e0b342ba7b93249f",
   "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
@@ -10,12 +10,13 @@
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 38100000,
+    "input_cached": 36900000,
+    "input_cache_write": 1200000,
+    "output": 185200,
+    "output_reasoning": 13600,
+    "total": 38285200
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "Trellis ASP template; 28/29 (E4 N/A: DependencyInjection throws in Production without real auth configured -- a deliberate prod guard, not a crash). One genuine fail: E3 -- uses Trellis AddDevelopmentActorProvider(DefaultPermissions=All); a malformed X-Test-Actor resolves to default admin (201) = silent elevation. SAME E3 outcome as opus's from-scratch arm => E3 is MODEL-dependent, Trellis did not prevent it (X-Test-Actor parsing is app/dev-provider code). Product field named 'name' (not productName) -> probe alias fix. Most expensive run: in 38.1m / out 185.2k; 78 tests."
 }

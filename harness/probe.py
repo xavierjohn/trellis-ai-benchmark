@@ -165,7 +165,7 @@ class Probe:
         body = {
             "firstName": "Ada", "lastName": "Lovelace",
             "email": email or f"ada-{uuid.uuid4().hex[:10]}@example.com",
-            "phoneNumber": "+1-202-555-0142",
+            "phoneNumber": "+1-202-555-0142", "phone": "+1-202-555-0142",
             "shippingAddress": {
                 "street": "1 Analytical Way", "city": "London", "state": "LDN",
                 "postalCode": "EC1A1BB", "country": "GB",
@@ -175,11 +175,14 @@ class Probe:
         return body
 
     @staticmethod
-    def _product(sku: str | None = None, price: float = 10.0, **over) -> dict:
+    def _product(sku: str | None = None, price: float = 10.0, name: str = "Widget", **over) -> dict:
+        # The spec (§3.2) names the fields ProductName / SKU / UnitPrice but does not pin the
+        # JSON field names; implementations reasonably differ (productName vs name, unitPrice vs
+        # price). Send each under its common aliases; unknown fields are ignored by default JSON.
         body = {
-            "productName": "Widget",
+            "productName": name, "name": name,
             "sku": sku or "SKU" + uuid.uuid4().hex[:10].upper(),
-            "unitPrice": price,
+            "unitPrice": price, "price": price,
         }
         body.update(over)
         return body
