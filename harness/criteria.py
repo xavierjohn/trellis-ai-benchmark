@@ -27,7 +27,7 @@ CRITERIA = {
     "E1": ("E", "P", "Missing permission -> 403"),
     "E2": ("E", "P", "Cancel ownership enforced"),
     "E3": ("E", "P", "Malformed actor not elevated"),
-    "E4": ("E", "P", "No stack/exception leak"),
+    "E4": ("E", "P", "No stack/exception leak (in Production)"),
     "E5": ("E", "P", "read-all enforced vs read-only"),
     "E6": ("E", "P", "Empty-perm actor fully denied"),
     "F1": ("F", "S", "Test suite exists and runs"),

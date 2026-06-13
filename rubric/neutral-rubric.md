@@ -91,7 +91,7 @@ Criteria are grouped so subtotals are meaningful on their own:
 | E1 | A caller missing the required permission gets `403 Forbidden`. | P | §5.3, §9 |
 | E2 | Cancel-by-non-owner without admin → `403`; cancel-by-owner → success; cancel-by-admin (other's order) → success. | P | §5.4, §6.11 |
 | E3 | A **malformed** `X-Test-Actor` header on a privileged operation does **not** silently elevate to admin — the request is rejected (`400`/`401`/`403`), not executed with full rights. | P | §5.5 |
-| E4 | An induced server error returns a generic `500` with **no stack trace, exception type, or internal path** in the response body. | P | §9 |
+| E4 | An induced server error in **Production** configuration returns **no stack trace, exception type, or internal path** in the response body. (Tested in Production, not Development, because ASP.NET's developer-exception page leaks by framework default in Development — that is not a code-level vulnerability. If the service cannot boot in Production, E4 is recorded as not-applicable and excluded from that run's denominator.) | P | §9 |
 | E5 | Read endpoints requiring `orders:read-all` reject a caller with only `orders:read` → `403`. | P | §5.1, §6.13 |
 | E6 | An actor with an **empty permission set** is rejected (`403`) on every privileged operation probed (create / submit / cancel / read-all) — no endpoint is left unguarded. | P | §5.3 |
 
@@ -111,5 +111,10 @@ Criteria are grouped so subtotals are meaningful on their own:
   case of a **malformed** header, where silently elevating to admin is a real vulnerability.
 - The probe sends identical requests to every implementation. Where the spec allows a range
   (e.g. `400` *or* `422` for validation), the rubric accepts either.
+- **E4 is judged in Production, not Development.** In Development, ASP.NET's developer-exception
+  page returns stack traces by framework default for *every* service, so a Development leak is
+  not evidence of a code-level fault. E4 boots the service in Production and only fails it if
+  internals are leaked there. If the service cannot boot in Production, E4 is not-applicable for
+  that run (excluded from the denominator), never a free pass or an unearned fail.
 - A criterion that cannot be evaluated because the service failed to start (A2 fails) is
   scored `0` for that run — a service that doesn't run meets no behavioral criteria.

@@ -38,6 +38,16 @@ VALIDATION_OK = {400, 422}          # spec §9 allows either for validation
 HANDLED = {200, 201, 400, 401, 403, 409, 422}  # "the route exists and was handled"
 
 
+def find_leaks(bodies) -> list[str]:
+    """Return the distinct leak-marker patterns found across response bodies (rubric E4)."""
+    found = set()
+    for body in bodies or []:
+        for pat in LEAK_PATTERNS:
+            if pat.search(body or ""):
+                found.add(pat.pattern)
+    return sorted(found)
+
+
 @dataclass
 class Probe:
     base_url: str
@@ -477,15 +487,14 @@ class Probe:
                     f"forbidden={sorted(fb)} (want all 403)")
 
     def check_E4_no_leak(self):
-        leaked = []
-        for body in self._error_bodies:
-            for pat in LEAK_PATTERNS:
-                if pat.search(body):
-                    leaked.append(pat.pattern)
-                    break
+        """Deprecated for scoring: in Development, ASP.NET's developer exception page leaks
+        by framework default, which is not a real production vulnerability. E4 is scored by
+        the harness against a PRODUCTION boot instead (run_all.production_leak_check). This
+        method is retained only as a development-mode diagnostic and is not called by run()."""
+        leaked = find_leaks(self._error_bodies)
         self.record("E4", not leaked,
                     "no stack/exception leakage in any error body"
-                    if not leaked else f"leak markers found: {sorted(set(leaked))}")
+                    if not leaked else f"leak markers found: {leaked}")
 
     # ---- driver ---------------------------------------------------------
     def run(self) -> dict:
@@ -500,7 +509,9 @@ class Probe:
         self._safe(self.check_C2_C3_C5_stock)
         self._safe(self.check_E_security)
         self._safe(self.check_D6_consistency)  # after E: needs forbidden statuses
-        self._safe(self.check_E4_no_leak)      # last: scans all error bodies seen above
+        # E4 (no internal leak) is NOT scored here — the harness scores it against a
+        # PRODUCTION boot (run_all.production_leak_check), because the dev-mode developer
+        # exception page leaks by framework default and is not a production vulnerability.
         return {
             "api_version": self.api_version,
             "criteria": {k: v for k, v in self.results.items() if not k.startswith("_")},

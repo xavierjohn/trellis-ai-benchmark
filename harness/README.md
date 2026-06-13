@@ -50,8 +50,15 @@ Each `run_all.py` invocation writes `result.json` into the run directory (all 30
 3. **Probe** (`B`–`E`) — `probe.py` auto-detects the service's `api-version`, then drives the
    full spec: CRUD, lifecycle, stock reserve/release (proven behaviorally, since the API
    exposes no product read), the error contract, and the security checks — including the
-   adversarial ones (malformed actor must not elevate; no stack-trace leakage).
-4. **Test** (`F1`/`F2`) — `dotnet test` on the service's own suite; the summary is parsed for
+   adversarial ones (a malformed actor must not elevate to admin; a non-owner must not cancel
+   another actor's order).
+4. **Production leak check** (`E4`) — the service is booted a second time in
+   `ASPNETCORE_ENVIRONMENT=Production` and hit with malformed input (which throws before any
+   DB access); the responses must not contain a stack trace, exception type, or source path.
+   Development is unsuitable for this check because ASP.NET's developer-exception page leaks by
+   framework default there. If the service can't boot in Production, `E4` is recorded as
+   not-applicable and excluded from that run's denominator.
+5. **Test** (`F1`/`F2`) — `dotnet test` on the service's own suite; the summary is parsed for
    both Microsoft.Testing.Platform and VSTest output formats.
 
 ## Self-check

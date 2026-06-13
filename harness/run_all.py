@@ -28,7 +28,7 @@ import requests
 
 import static_checks
 from criteria import ALL_IDS, CRITERIA
-from probe import run_probe
+from probe import run_probe, find_leaks
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
@@ -151,6 +151,65 @@ def _kill(proc: subprocess.Popen):
                 pass
 
 
+def production_leak_check(project_dir: Path, dll: Path, api_version: str | None):
+    """Score E4 fairly: boot the service in PRODUCTION and fire malformed-input requests
+    (which throw in the pipeline, before any DB access), asserting no response body leaks a
+    stack trace, exception type, or source path. Development is unsuitable because ASP.NET's
+    developer exception page leaks by framework default — that is not a production
+    vulnerability. Returns (ok: bool | None, evidence); None => could not boot in Production,
+    so E4 is not applicable for this run."""
+    ver = api_version or "2026-11-12"
+    port = free_port()
+    base = f"http://127.0.0.1:{port}"
+    for db in project_dir.glob("*.db"):
+        try:
+            db.unlink()
+        except OSError:
+            pass
+    env = {
+        **os.environ,
+        "ASPNETCORE_URLS": base,
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "DOTNET_ENVIRONMENT": "Production",
+        "DOTNET_NOLOGO": "1",
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    }
+    proc = subprocess.Popen(
+        ["dotnet", str(dll)], cwd=str(project_dir), env=env,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+    )
+    try:
+        if not _wait_health(base, proc, 60):
+            return None, "service did not boot in Production; E4 not applicable"
+        v = f"?api-version={ver}"
+        good = ('{"firstName":"A","lastName":"B","email":"leak@probe.test",'
+                '"shippingAddress":{"street":"s","city":"c","state":"x",'
+                '"postalCode":"p","country":"co"}}')
+        attempts = [
+            # valid body + valid version + MALFORMED actor header -> actor parse throws
+            ("POST", "/api/customers", {"X-Test-Actor": "not-json-{{{",
+                                        "Content-Type": "application/json"}, good),
+            ("POST", "/api/customers", {"X-Test-Actor": '{"id":"x","permissions":"orders:create"}',
+                                        "Content-Type": "application/json"}, good),
+            # malformed / wrong-typed JSON body -> model binding throws
+            ("POST", "/api/customers", {"Content-Type": "application/json"}, '{"firstName":'),
+            ("POST", "/api/products", {"Content-Type": "application/json"},
+                                       '{"productName":123,"sku":true,"unitPrice":"abc"}'),
+        ]
+        bodies = []
+        for method, path, headers, data in attempts:
+            try:
+                r = requests.request(method, base + path + v, headers=headers, data=data, timeout=20)
+                bodies.append(r.text or "")
+            except requests.RequestException:
+                pass
+        leaks = find_leaks(bodies)
+        return (not leaks), ("no internal leakage in production error responses"
+                             if not leaks else f"production response leaked: {leaks}")
+    finally:
+        _kill(proc)
+
+
 def evaluate(run_dir: Path, do_test: bool = True) -> dict:
     run_dir = run_dir.resolve()
     meta = _read_meta(run_dir)
@@ -175,6 +234,11 @@ def evaluate(run_dir: Path, do_test: bool = True) -> dict:
             else:
                 for cid, val in probe_out.get("criteria", {}).items():
                     result[cid] = val
+                # E4 (no internal leak) — scored against a PRODUCTION boot, since the dev
+                # developer-exception page leaks by framework default (not a prod vuln).
+                leak_ok, leak_ev = production_leak_check(project_dir, dll, api_version)
+                result["E4"] = {"pass": (None if leak_ok is None else (1 if leak_ok else 0)),
+                                "evidence": leak_ev}
     else:
         result["A2"]["evidence"] = "build failed"
 
@@ -186,13 +250,15 @@ def evaluate(run_dir: Path, do_test: bool = True) -> dict:
         result["F2"] = {"pass": 1 if t.get("passed") else 0,
                         "evidence": f"passed={t.get('passed_total')} failed={t.get('failed_total')}"}
 
-    passed = sum(v["pass"] for v in result.values())
+    numeric = [v["pass"] for v in result.values() if v.get("pass") is not None]
+    passed = sum(numeric)
+    total = len(numeric)
     out = {
         **meta,
         "evaluated_at": datetime.now(timezone.utc).isoformat(),
         "api_version": api_version,
-        "score": {"passed": passed, "total": len(ALL_IDS),
-                  "rate": round(passed / len(ALL_IDS), 3)},
+        "score": {"passed": passed, "total": total,
+                  "rate": round(passed / total, 3) if total else 0.0},
         "criteria": result,
     }
     (run_dir / "result.json").write_text(json.dumps(out, indent=2), encoding="utf-8")

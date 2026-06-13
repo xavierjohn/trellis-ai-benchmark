@@ -71,8 +71,13 @@ benchmark would measure adherence to Trellis, not quality — and would prove no
 Scoring is automated and mostly **black-box** ([`harness/`](harness/)):
 
 - A **probe** boots each service and drives it over HTTP — including adversarial requests it
-  cannot fake compliance for (a malformed `X-Test-Actor` must not act as admin; an induced
-  error must not leak internals; a non-owner must not cancel another actor's order).
+  cannot fake compliance for (a malformed `X-Test-Actor` must not act as admin; a non-owner
+  must not cancel another actor's order). Functional probes run in **Development** (the spec
+  mandates it — `EnsureCreated` and the connection string are gated to Development).
+- The **no-leak** check (E4) is run separately against a **Production** boot: ASP.NET's
+  developer-exception page leaks stack traces by framework default in Development, so testing
+  there would flag a default both arms share rather than a real, code-level vulnerability.
+  In Production, a leak means the service deliberately serializes internals to clients.
 - **Static checks** confirm it builds and that its own test suite runs and passes.
 
 Black-box-by-construction is the strongest evidence available: the probe does not know or care
@@ -103,6 +108,7 @@ which framework produced the service.
 | **Probe gaps / false negatives.** | The probe is validated against a correct implementation and its evidence strings are recorded per criterion for audit. |
 | **Model/version drift over time.** | Each run records model, template version, and SDK in `meta.json`; re-running later is expected to differ and that's disclosed. |
 | **Generation contamination** — an arm reading the other's files or the framework source. | Each service is generated in isolation and committed as-is; the generation method is recorded in `meta.json`. |
+| **Environment-dependent leakage** — flagging a dev-only default as a vulnerability. | The no-leak check (E4) is run in **Production**, not Development, because ASP.NET's developer-exception page leaks by default in Development for *every* service. Only a Production leak — deliberately serialized internals — is scored. §5. |
 
 ## 8. What this proves — and what it doesn't
 

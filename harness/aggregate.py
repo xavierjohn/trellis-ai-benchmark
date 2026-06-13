@@ -44,11 +44,16 @@ def rates(results: list[dict]):
         if not cond or not model or not crit:
             continue
         run_passed = 0
+        run_total = 0
         for cid in ALL_IDS:
             v = crit.get(cid, {}).get("pass", 0)
+            if v is None:          # criterion not applicable for this run (e.g. E4 prod boot)
+                continue
             by_cell_crit[(cond, model, cid)].append(v)
             run_passed += v
-        by_cell_run[(cond, model)].append(run_passed / len(ALL_IDS))
+            run_total += 1
+        if run_total:
+            by_cell_run[(cond, model)].append(run_passed / run_total)
     return by_cell_crit, by_cell_run
 
 
