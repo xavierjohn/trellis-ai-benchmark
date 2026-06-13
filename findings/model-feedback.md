@@ -205,7 +205,55 @@ quantitative artifact by the model's own qualitative account.
 > I stored one reusable fact about the 422 binder seam since it'll bite any future Trellis build
 > with a 400-validation spec.
 
-## Cross-model convergence (GPT-5.5 + opus-4.8)
+## Verbatim feedback — sonnet-4.6
+
+### Run 1
+
+> Prompt asked of the model: *"feedback / impressions of the framework?"*
+
+> Having just built a realistic service with it, here are my honest impressions:
+>
+> **What works really well:**
+>
+> - **Railway Oriented Programming is genuinely ergonomic.** `Bind`/`Map`/`Tap`/`Check` chains make
+>   happy/failure paths explicit. Handlers read like a pipeline, not a nest of `if` blocks.
+> - **Value objects + source generators eliminate a whole class of bugs.** `RequiredString<T>`,
+>   `RequiredGuid<T>` etc. mean invalid state truly can't be constructed — and you get JSON
+>   converters, EF converters, and ASP binding for free.
+> - **`LazyStateMachine` is a clever fix** for the EF materialization race condition. Without it,
+>   you'd hit `NullReferenceException` when EF constructs the aggregate before populating state.
+> - **`Maybe<T>` + EF integration** — partial `Maybe<T>` properties that source-generate backing
+>   fields and map to nullable columns is elegant.
+> - **The error ADT** (`Error.InvalidInput`, `Error.NotFound`, `Error.Conflict`, etc.) maps cleanly
+>   to HTTP status codes with no configuration.
+>
+> **Friction points I noticed:**
+>
+> - The **hardcoded 422 in the scalar binder is a footgun.** The copilot instructions even dedicate a
+>   memory entry to it — "use primitive DTOs to get spec-mandated 400." That's a leaky abstraction.
+> - The `[OwnedEntity]` attribute coupling — composite value objects in the Domain layer need a
+>   private parameterless constructor because they can't take an EF Core dependency. A small but real
+>   tension between "clean domain" and "EF works."
+> - The learning curve is steep. The `copilot-instructions.md` is 42KB of rules. Getting stock
+>   reservation right (pass products into the domain method so EF tracks changes) requires
+>   understanding the entire stack.
+> - **Source generator opacity** — when `ApplyTrellisConventionsFor<TContext>()` silently doesn't
+>   register something, debugging is non-trivial.
+>
+> Overall: It's a well-thought-out opinionated framework that trades flexibility for correctness
+> guarantees. The value proposition for AI-generated code is real — the constraints do reduce the
+> surface area for bad outputs. But it rewards deep familiarity and punishes guessing.
+
+> **⚠️ Integrity note (not the model's words):** this feedback is the **smoking gun** for the
+> cross-session memory leak — sonnet explicitly says "the copilot instructions even dedicate a
+> **memory entry** to it — 'use primitive DTOs to get spec-mandated 400'," which is **verbatim a
+> memory stored earlier in this benchmark**. So this `with-trellis` generation had the account's
+> memories loaded. For the `with-trellis` arm that runs in the **inflating** direction (insider
+> Trellis knowledge), unlike the conservative baseline case — yet sonnet still produced the
+> benchmark's **lowest** with-Trellis score (26/29: unprotected read-all endpoints via empty
+> `RequiredPermissions`, plus the dev-actor-provider E3). See `METHODOLOGY.md` for handling.
+
+## Cross-model convergence (GPT-5.5 + opus-4.8 + sonnet-4.6)
 
 Two different frontier models, building the same service independently across four runs, agree on
 the core points — which is the strongest signal a qualitative account can give:
