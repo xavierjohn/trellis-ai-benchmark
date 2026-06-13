@@ -54,6 +54,67 @@ in the model's own words — useful context alongside the (parity) scores.
 >   before either saves; EF optimistic concurrency / a rowversion would close this).
 > - Pagination on the list endpoints.
 
+## Verbatim — sonnet-4.6, without-trellis (run 1)
+
+> Prompt asked of the model: *"how was building the service?"* (an open reflection)
+
+> Genuinely interesting exercise — here are my honest observations:
+>
+> **What went smoothly**
+>
+> - The domain model was clean to write. The state machine with callback-injected side effects
+>   (`Submit(now, reserveStock)`) kept domain logic pure without any infrastructure leaking in.
+> - MediatR made the permission-check pattern very consistent — every handler opens with the same
+>   guard, easy to audit.
+> - SQLite + `EnsureCreated` is genuinely zero-friction for a spec like this.
+>
+> **Where I had to make decisions the spec left open**
+>
+> - The "same product can't appear twice" rule — I enforced it at AddLineItem time (throw), not at
+>   submit time. The spec says "combine quantities instead" as advice, but there's no
+>   combine-on-conflict operation defined, so I chose hard rejection.
+> - `X-Test-Actor` absent → default Admin. That's spec-defined but it's a sharp edge in real code.
+>
+> **What felt slightly awkward without Trellis**
+>
+> - The permission checks are pure boilerplate repeated in every handler. With Trellis analyzers, a
+>   missing check would be a compile error. Here it's invisible until a test catches it.
+> - Error mapping in the exception handler is a switch expression on exception types — functional,
+>   but it's a convention you have to remember to follow, not something the compiler enforces.
+> - The `CreateDraftOrderCommand` has 10+ constructor parameters. With Trellis's value object
+>   discipline that would be tighter.
+>
+> **The one real bug I hit**
+> EF Core's SQLite provider can't translate `DateTimeOffset?` comparisons in LINQ to SQL — had to
+> fall back to client-side filtering for the overdue query. That's a known SQLite limitation but
+> easy to miss.
+>
+> Overall: the spec is well-designed. Clear enough to build without questions, realistic enough that
+> the edge cases (ownership on cancel, stock release on cancel, price snapshot at order time) are the
+> interesting parts.
+
+## A note on baseline "Trellis-awareness"
+
+sonnet's reflection references Trellis ("without Trellis", "with Trellis analyzers a missing check
+would be a compile error"). That awareness has a mundane source and is **not** a clean-room breach:
+
+- **The `without-trellis` prompt names Trellis** — it instructs "Do not use the Trellis framework or
+  the Trellis ASP template" to *define the baseline condition*. So the model knows Trellis exists and
+  is being asked to build without it.
+- **Trellis is a public framework**, so any frontier model has some training-data awareness of it.
+- **What the clean-room actually prevents** — reading Trellis's *source, docs, or reference
+  implementation from disk* — held: the service was generated in an isolated directory outside the
+  Trellis tree, so the baseline could not copy Trellis's code or patterns.
+
+Direction of the effect: if anything, knowing Trellis exists could only make the baseline *stronger*
+(adopt Trellis-like discipline from memory), which biases **against** finding a Trellis advantage —
+a conservative confound, not an inflating one. It is disclosed here and in `METHODOLOGY.md`.
+
+Notably, the awareness cuts the other way too: the **baseline model itself** says a missing
+permission check "with Trellis analyzers … would be a compile error [but] here it's invisible until
+a test catches it," and that error mapping is "a convention you have to remember … not something the
+compiler enforces." That is the build-time-guardrail thesis, conceded by the arm *without* Trellis.
+
 ## Reading it honestly
 
 Two of these are security/robustness-relevant and the model raised them **unprompted**:
@@ -69,3 +130,9 @@ Two of these are security/robustness-relevant and the model raised them **unprom
 These are **not** scored (the rubric is happy-path and neutral), and nothing here asserts the
 Trellis arm avoids them. They are recorded as the baseline's self-reported latent surface, for an
 honest reader to weigh against the parity scores.
+
+**Cross-model corroboration:** sonnet independently hit the *same* real bug opus flagged — EF
+Core's SQLite provider can't translate `DateTimeOffset` comparisons in LINQ, so the overdue query
+had to fall back to client-side filtering. Two different models, building from scratch, hit the
+identical runtime (not compile-time) failure on the same query — a concrete example of the latent
+surface a happy-path rubric doesn't capture.
