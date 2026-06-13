@@ -151,13 +151,18 @@ Trellis-naming prompt; the remaining baselines are un-primed. Each run's `meta.j
 records which version it used.
 
 **What the de-named run shows:** sonnet's run 2 used the de-named prompt, and the generated service
-references Trellis **0 times** (verified) — yet the model's *post-hoc reflection* still mentions
-"the Trellis version" and "your benchmark." Awareness of Trellis (a public framework) and of the
-benchmark's framing is therefore **unavoidable in the reflection**, but it did **not** change the
-**artifact**: the service is standard .NET, and run 2 made the *same* E3 mistake (`catch → Admin`)
-as run 1 — i.e. the awareness produced no measurable improvement. The scored artifact is what
-matters, and it is clean; the reflection is post-hoc commentary. (Generation sessions are kept to
-the paste prompt only; the benchmark framing enters, at most, when feedback is requested afterward.)
+references Trellis **0 times** (verified) — yet the model's reflection mentions "the Trellis version"
+and "your benchmark." Checking the captured session, that session's *two user turns* (the build
+prompt and a plain "What do you think about building this service?") contained **no** "Trellis"
+either — so the awareness came from **loaded session context**, not the conversation. The mechanism
+is Copilot's **shared memory / global-instruction system**: user-scoped memories (and
+`$HOME/.copilot/` instructions) load into every session for the same account — including clean-room
+generations — and generation sessions can even *write* memories that load into later ones. The
+"your benchmark" reference is the giveaway: a brand-new benchmark is not in training data, so the
+model read it from loaded memory. This did **not** change the **artifact** (standard .NET; same E3
+mistake as run 1 — no measurable improvement); it is awareness-level, not code-copying, and the
+filesystem clean-room held. Memory is **disabled (`/memory`)** for the remaining generations;
+the completed runs are kept and disclosed. See `METHODOLOGY.md` for the full threat entry.
 
 Notably, the awareness cuts the other way too: the **baseline model itself** keeps conceding the
 thesis. gpt-5.5/sonnet say a missing permission check "with Trellis analyzers … would be a compile

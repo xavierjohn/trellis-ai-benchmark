@@ -36,6 +36,11 @@ sonnet-4.6}, run `N` ∈ {1, 2, 3}:
 1. **Fresh scratch dir, outside the Trellis tree:** `mkdir C:\bench\C\M\run-N` and `cd` into it,
    then start a brand new CLI session there with model `M` selected. Confirm the session's
    working directory is the scratch dir (it must not be able to reach the Trellis tree).
+   - **Isolate the session context.** Run `/memory` and **disable** memory for the session — Copilot
+     user-scoped memories load into every session for the same account and can carry Trellis/
+     benchmark facts (a cross-session leak the filesystem clean-room does not stop). Also ensure
+     `$HOME/.copilot/copilot-instructions.md` and `$HOME/.copilot/instructions/**` contain no
+     Trellis/benchmark content (those load globally too). This keeps the baseline truly un-primed.
 2. **Paste** the entire contents of `prompts/paste/C.md` as the task. Let the model build the
    service to completion (it should build, expose `/health`, and ship a passing test suite).
 3. **Verify locally** in the scratch dir: `dotnet build -c Release` and `dotnet test -c Release`
