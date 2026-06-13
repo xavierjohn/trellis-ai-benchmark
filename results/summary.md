@@ -21,7 +21,7 @@ comparable signal across arms, since `input` is dominated by the identical paste
 | Model | Without: output | Without: total | With: output | With: total |
 |---|---|---|---|---|
 | gpt-5.5 | 19.3k | 916.4k | 36.8k | 5.94M |
-| opus-4.8 | 75.2k | 6.93M | 185.2k | 38.29M |
+| opus-4.8 | 77.1k | 8.11M | 185.2k | 38.29M |
 | sonnet-4.6 | — | — | — | — |
 
 > Scores measure **observable outcomes only** (spec compliance, correct status codes,
