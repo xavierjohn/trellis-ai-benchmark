@@ -118,6 +118,13 @@ which framework produced the service.
 - **It does not show**: that Trellis is the only way to reach those outcomes (a disciplined
   team can hit every criterion by hand), nor that the effect generalizes beyond this spec, nor
   anything about long-term maintenance, performance, or developer experience.
+- **A known blind spot**: the rubric scores the *final* working service, so it cannot see the
+  mistakes Trellis converted into build-time errors before that state was reached. On a fully
+  specified spec with a thorough test suite those bugs are often caught anyway; on a real,
+  under-specified, evolving codebase they would not be. The generating models' own accounts of
+  this mechanism are recorded — verbatim, with their criticisms intact — in
+  [`findings/model-feedback.md`](findings/model-feedback.md). That is qualitative context, not
+  scored evidence, and is kept strictly separate from the rubric.
 
 ## 9. Reproduce
 

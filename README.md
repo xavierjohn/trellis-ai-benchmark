@@ -22,6 +22,14 @@ the 30 neutral criteria, per model, with the with-Trellis delta) and
 
 > Results are regenerated from the raw runs by `harness/aggregate.py`; they are not hand-edited.
 
+**The outcome rubric is only half the story.** It scores the *final* working service — so when a
+frontier model reaches a spec-compliant service both with and without Trellis, the rubric shows
+parity. What it cannot see is the wrong turns that never reached the final state. For that, the
+generating model's own first-person account is recorded in
+**[`findings/model-feedback.md`](findings/model-feedback.md)** — including its summary that
+Trellis's value is "narrowing the space of acceptable code so generated implementations fail
+loudly instead of becoming subtle runtime bugs."
+
 ## How it works
 
 ```
@@ -54,6 +62,7 @@ rubric/               the 30 outcome-only scoring criteria
 runs/                 the 18 raw generated services (+ per-run result.json)
 harness/              Python scorer: probe.py, static_checks.py, run_all.py, aggregate.py
 results/              generated headline + per-criterion tables
+findings/             qualitative, non-scored evidence (e.g. the generating model's own feedback)
 GENERATION.md         clean-room runbook for producing the 18 services
 METHODOLOGY.md        design, controls, and threats to validity
 ```
