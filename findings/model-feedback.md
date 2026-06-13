@@ -20,7 +20,12 @@ become subtle runtime bugs. On a complete spec with a thorough test suite, many 
 bugs would be caught anyway; on a real, under-specified, evolving codebase, they would not. That
 is the crux of the value, and it is upstream of any outcome the rubric records.
 
-## Verbatim feedback — GPT-5.5 (after generating a `with-trellis` service)
+## Verbatim feedback — GPT-5.5
+
+Collected after each `with-trellis` generation; the same open question was asked of the
+session that built the service.
+
+### Run 1
 
 > Prompt asked of the model: *"what feedback do you have about the trellis framework?"*
 
@@ -47,6 +52,55 @@ is the crux of the value, and it is upstream of any outcome the rubric records.
 > 6. **The framework is AI-friendly.** The biggest value is not reducing code volume; it's
 >    narrowing the space of acceptable code so generated implementations fail loudly instead of
 >    becoming subtle runtime bugs.
+
+### Run 2
+
+> Trellis gave strong guardrails, but the template/API surface still has some friction.
+>
+> **What worked well**
+>
+> - Source generators and analyzers caught real issues early, especially discarded `Result`
+>   values and EF `Maybe<T>` conventions.
+> - `Required*` value objects made validation explicit and pushed bad input handling to the
+>   boundary.
+> - The layered template made Domain → Application → ACL → API separation clear.
+> - Trellis Problem Details / `Result` conventions are a good fit for expected business failures.
+>
+> **Friction points**
+>
+> - The framework is powerful but hard to use without constantly reading reference docs; small
+>   signature differences (`ValueObject.GetEqualityComponents`, `IDomainEvent.OccurredAt`) are
+>   easy to miss.
+> - `IResult` name collision with ASP.NET's `IResult` is annoying in API controllers.
+> - EF mapping for backing collections is still easy to get wrong; the failure is runtime
+>   model-building, not compile-time.
+> - The sample Todo app is feature-rich, but replacing it wholesale is noisy because many old
+>   sample files/tests need exclusion or deletion.
+> - Default Trellis invalid transitions map as validation, but the framework docs mention `422`
+>   while this spec wanted `400`, so implementers need explicit status-code decisions.
+>
+> **Biggest improvement opportunity:** add a "replace Todo with your domain" recipe or generator
+> mode that removes Todo surfaces and creates clean empty layer skeletons. That would reduce a
+> lot of incidental work and mistakes.
+
+## Consistency across the two GPT-5.5 runs
+
+Asked the same open question after two independent generations, GPT-5.5 named the **same core
+points both times** — which makes them signal, not noise:
+
+- **Guardrails catch real bugs early** (discarded `Result`, EF `Maybe<T>` shape) — both runs.
+- **Docs are dense / must be read constantly** — both runs.
+- **`InvalidInput → 422` vs specs expecting `400`** — both runs, *and* independently reproduced
+  by this benchmark's harness (rubric D6). Three independent hits on the same rough edge.
+- **EF backing-collection mapping is error-prone, failing at runtime not compile time** — both runs.
+
+Run 2 adds a pointed one that **explains this benchmark's own run-2 artifact**: *"replacing [the
+Todo sample] wholesale is noisy because many old sample files/tests need exclusion or deletion."*
+That is exactly the fault observed in [`runs/with-trellis/gpt-5.5/run-2`](../runs/with-trellis/gpt-5.5/run-2),
+which shipped a correct Order Management service but left the template's Todo sample in place.
+The model both **committed** the mistake and, asked separately, **diagnosed** it — and proposed
+the fix (a "replace Todo with your domain" generator mode). A clean corroboration of a
+quantitative artifact by the model's own qualitative account.
 
 ## Reading it honestly
 
