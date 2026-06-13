@@ -34,6 +34,34 @@ def pct(x: float | None) -> str:
     return "—" if x is None else f"{x*100:.0f}%"
 
 
+def fmt_k(n: float | None) -> str:
+    if n is None:
+        return "—"
+    return f"{n/1000:.1f}k" if n < 1_000_000 else f"{n/1_000_000:.2f}M"
+
+
+def token_stats():
+    """(cond, model) -> list of token dicts, read from each run's meta.json."""
+    data = defaultdict(list)
+    for mj in (REPO / "runs").glob("**/meta.json"):
+        try:
+            m = json.loads(mj.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        t = m.get("tokens") or {}
+        if t.get("total") is None:
+            continue
+        data[(m.get("condition"), m.get("model"))].append(t)
+    return data
+
+
+def mean_k(lst, field: str) -> str:
+    if not lst:
+        return "—"
+    vals = [t.get(field) for t in lst if t.get(field) is not None]
+    return fmt_k(sum(vals) / len(vals)) if vals else "—"
+
+
 def rates(results: list[dict]):
     """(cond, model, crit) -> mean pass; and (cond, model) -> list of run totals."""
     by_cell_crit = defaultdict(list)   # (cond,model,crit) -> [0/1,...]
@@ -90,6 +118,26 @@ def write_summary(by_cell_run, n_results: int):
     d_all = None if (wo_all is None or wi_all is None) else (wi_all - wo_all) * 100
     lines.append(f"| **All models** | **{pct(wo_all)}** | **{pct(wi_all)}** | "
                  f"**{'—' if d_all is None else f'{d_all:+.0f}'}** |")
+
+    tok = token_stats()
+    if tok:
+        lines += [
+            "",
+            "### Generation cost (tokens per service)",
+            "",
+            "Mean tokens to produce one working service. `output` is the generated work — the most",
+            "comparable signal across arms, since `input` is dominated by the identical pasted spec",
+            "(most of which is cached).",
+            "",
+            "| Model | Without: output | Without: total | With: output | With: total |",
+            "|---|---|---|---|---|",
+        ]
+        for model in MODELS:
+            wo = tok.get(("without-trellis", model))
+            wi = tok.get(("with-trellis", model))
+            lines.append(f"| {model} | {mean_k(wo, 'output')} | {mean_k(wo, 'total')} | "
+                         f"{mean_k(wi, 'output')} | {mean_k(wi, 'total')} |")
+
     lines += [
         "",
         "> Scores measure **observable outcomes only** (spec compliance, correct status codes,",

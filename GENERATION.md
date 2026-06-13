@@ -48,8 +48,9 @@ sonnet-4.6}, run `N` ∈ {1, 2, 3}:
    ```
 
    Do **not** edit the generated code; it is the evidence.
-5. **Finish `meta.json`** in `runs/C/M/run-N/`: set `generated_at`, and for `without-trellis`
-   put the stack the model chose into `notes`. (Hashes, versions, and SDK are already filled.)
+5. **Finish `meta.json`** in `runs/C/M/run-N/`: set `generated_at`, the `tokens` the CLI
+   reports for the session (`input`/`output`/`total`), and for `without-trellis` put the stack
+   the model chose into `notes`. (Hashes, versions, and SDK are already filled.)
 6. **Delete the scratch dir** once intake succeeds.
 
 ## Then score

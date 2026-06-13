@@ -9,6 +9,13 @@
   "template": null,
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
+  "tokens": {
+    "input": null,
+    "input_cached": null,
+    "output": null,
+    "output_reasoning": null,
+    "total": null
+  },
   "generator": "manual clean-room",
   "notes": ""
 }

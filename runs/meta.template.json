@@ -9,6 +9,13 @@
   "template": "Trellis.AspTemplate 1.0.21-alpha",
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "",
+  "tokens": {
+    "input": null,
+    "input_cached": null,
+    "output": null,
+    "output_reasoning": null,
+    "total": null
+  },
   "generator": "manual clean-room",
   "notes": ""
 }

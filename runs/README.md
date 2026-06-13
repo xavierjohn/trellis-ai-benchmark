@@ -38,10 +38,18 @@ Every run records an audit trail so the result is traceable to its exact inputs:
   "template": "Trellis.AspTemplate 1.0.21-alpha",
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "10.0.301",
-  "generator": "manual paste | task-subagent",
+  "tokens": { "input": 897100, "input_cached": 832000, "output": 19300, "output_reasoning": 2900, "total": 916400 },
+  "generator": "manual clean-room",
   "notes": ""
 }
 ```
 
 For `without-trellis` runs, `template` and `trellis_packages` are `null` and the `notes`
 field records the baseline stack the model chose (e.g. "controllers + EF Core + FluentValidation").
+
+`tokens` records the generating session's usage as the CLI reports it: `input` (↑, with the
+`input_cached` subset), `output` (↓, with the `output_reasoning` subset), and `total`. This
+captures the **cost** of producing each service, so the benchmark can compare not just
+*quality* but how many tokens each arm needed to reach a working service. `output` is the most
+comparable signal across arms (input is dominated by the identical pasted spec, most of which
+is cached). Leave unknown fields `null`.

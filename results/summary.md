@@ -1,6 +1,6 @@
 # Headline results
 
-_Generated 2026-06-13 00:16 UTC from 1 run(s)._
+_Generated 2026-06-13 00:33 UTC from 1 run(s)._
 
 Each cell is the **mean pass rate over the 30 neutral criteria**, averaged across runs.
 Higher is better. Δ is the with-Trellis advantage in percentage points.
@@ -11,6 +11,18 @@ Higher is better. Δ is the with-Trellis advantage in percentage points.
 | opus-4.8 | — | — | — |
 | sonnet-4.6 | — | — | — |
 | **All models** | **100%** | **—** | **—** |
+
+### Generation cost (tokens per service)
+
+Mean tokens to produce one working service. `output` is the generated work — the most
+comparable signal across arms, since `input` is dominated by the identical pasted spec
+(most of which is cached).
+
+| Model | Without: output | Without: total | With: output | With: total |
+|---|---|---|---|---|
+| gpt-5.5 | 19.3k | 916.4k | — | — |
+| opus-4.8 | — | — | — | — |
+| sonnet-4.6 | — | — | — | — |
 
 > Scores measure **observable outcomes only** (spec compliance, correct status codes,
 > security behavior, tests passing) — never the use of any framework. See

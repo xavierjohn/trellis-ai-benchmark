@@ -2,13 +2,20 @@
   "condition": "without-trellis",
   "model": "gpt-5.5",
   "run": 1,
-  "generated_at": "",
+  "generated_at": "2026-06-12T17:06:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "1280d5a4312d4bb789b455c1a4bb4faa196ad486f4170b15e284d6e30b86bf12",
   "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
   "template": null,
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
+  "tokens": {
+    "input": 897100,
+    "input_cached": 832000,
+    "output": 19300,
+    "output_reasoning": 2900,
+    "total": 916400
+  },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "minimal APIs + EF Core (SQLite) + AddProblemDetails; built from scratch"
 }
