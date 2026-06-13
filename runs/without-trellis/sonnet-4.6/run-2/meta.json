@@ -4,7 +4,7 @@
   "run": 2,
   "generated_at": "",
   "prompt": "prompts/paste/without-trellis.md",
-  "prompt_sha256": "8b4ceb9eb10800ac8bf6d1b61288ac2c9d3f004d32fbc88c343d67e99e5e0116",
+  "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
   "template": null,
   "trellis_packages": null,

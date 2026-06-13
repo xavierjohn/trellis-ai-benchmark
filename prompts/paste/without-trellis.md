@@ -1,11 +1,13 @@
 You are a senior .NET engineer. Build a complete, working **Order Management** web service in
 C# on **.NET 10** that satisfies the specification included at the END of this message, in full.
 
-**Framework for this build:** your choice. Start from `dotnet new web` (or `webapi`) and use
-whatever production-grade libraries, architecture, and patterns you judge best — minimal APIs
-or controllers, EF Core or another data layer, FluentValidation or manual validation, etc.
-**Do not use the Trellis framework or the Trellis ASP template.** Build it the way a strong
-.NET team would build a real service.
+**Framework for this build:** your choice of standard, widely-used .NET libraries. Start from
+`dotnet new web` (or `webapi`) and use whatever production-grade architecture and patterns you
+judge best — minimal APIs or controllers, EF Core or another data layer, FluentValidation or
+manual validation, etc. Do **not** scaffold from a pre-built domain/service template, and do
+**not** build on an opinionated DDD / railway-oriented "result" application framework — assemble
+the solution yourself from mainstream libraries. Build it the way a strong .NET team would build
+a real service.
 
 **Deliverable**
 

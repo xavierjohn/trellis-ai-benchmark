@@ -110,6 +110,12 @@ Direction of the effect: if anything, knowing Trellis exists could only make the
 (adopt Trellis-like discipline from memory), which biases **against** finding a Trellis advantage —
 a conservative confound, not an inflating one. It is disclosed here and in `METHODOLOGY.md`.
 
+**Update:** after the first 5 baseline runs, the prompt was **de-named** — it now excludes "a
+pre-built domain/service template" and "an opinionated DDD / railway-oriented result framework"
+without naming Trellis. So baselines 1–5 (gpt-5.5 r1; opus-4.8 r1–r3; sonnet-4.6 r1) carry the
+Trellis-naming prompt; the remaining baselines are un-primed. Each run's `meta.json` `prompt_sha256`
+records which version it used.
+
 Notably, the awareness cuts the other way too: the **baseline model itself** says a missing
 permission check "with Trellis analyzers … would be a compile error [but] here it's invisible until
 a test catches it," and that error mapping is "a convention you have to remember … not something the
