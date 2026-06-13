@@ -153,19 +153,78 @@ quantitative artifact by the model's own qualitative account.
 > concrete instances (the 17 dropped Results, the 415 misconfig, the bypassed-auth test trap) that
 > would be compelling, quantified benchmark data points.
 
+### Run 2
+
+> Prompt asked of the model: *"what feedback do you have about the trellis framework?"*
+
+> Here's my honest feedback after building the full service on Trellis:
+>
+> **What worked really well**
+>
+> - **Railway-oriented `Result<T>`/`Maybe<T>`** — composing handlers with
+>   `Bind`/`Map`/`Combine`/`TraverseAll` is genuinely pleasant, and `Combine` merging two
+>   `Error.InvalidInput` into one accumulated error is exactly right for request validation.
+> - **Value-object primitives + `RequiredEnum<T>`** — eliminating primitive obsession at the type
+>   level meant most validation was "free" and impossible-to-misuse. `OrderStatus` as
+>   `RequiredEnum` persisting as a string via conventions just worked.
+> - **Analyzers earned their keep.** TRLS001 (unhandled `Result`) caught real dropped-error bugs in
+>   domain code I'd otherwise have missed.
+> - **`LazyStateMachine`** neatly solved the EF-materialization-ordering problem — no NREs despite
+>   state being set after construction.
+> - **Testing surface is strong:** `FakeRepository`, `TestActorProvider.WithActor(...)`, and
+>   `BeSuccess()`/`BeFailureOfType<>()`/`Unwrap()` made the 87 tests terse and intention-revealing.
+> - **EF conventions** (`ApplyTrellisConventionsFor`, `AddTrellisInterceptors`, partial `Maybe<T>`)
+>   removed a lot of mapping boilerplate.
+>
+> **Friction points (highest signal first)**
+>
+> 1. The **422-vs-400 contradiction is the big one.** The framework steers you toward
+>    value-objects-in-request-DTOs as idiomatic, but that binder seam returns a hardcoded 422 that
+>    `MapError<Error.InvalidInput>(400)` cannot override. Meanwhile almost every real spec wants 400
+>    for validation. The only way out was to make DTOs primitive and rebuild VOs in the controller
+>    via `TryCreate`/`Combine` — which contradicts the "VOs everywhere" guidance. This cost the most
+>    investigation time and isn't documented as a tradeoff. Worth either making the binder seam
+>    respect `MapError`, or documenting the primitive-DTO pattern as the recommended approach for
+>    400 semantics.
+> 2. **Discoverability depends on reading template tests, not docs.** Several keys (`MapError`
+>    existence, `AddTrellisAspWithScalarValidation`, the `AddResourceAuthorization` namespace living
+>    in `Trellis.Mediator` not `Trellis.Authorization`) I only found by grepping the sample/tests.
+>    The `.md` references are thorough but answer "how does X work" better than "which X do I need."
+> 3. The `[Consumes("application/json")]` → 415 trap on body-less transition POSTs is documented,
+>    but it's a sharp edge — a class-level attribute silently breaks every trigger endpoint. A
+>    generated-API analyzer warning here would prevent it entirely.
+> 4. Minor: TRLS001 forcing `.Unwrap()`/`.Discard()` on every `Result` in tests is correct but
+>    noisy; combined with default CA1822/xUnit1031, test scaffolding takes a few compile-fix
+>    iterations before it's clean.
+>
+> Net: the compiler/analyzer guardrails delivered — generated code that compiled tended to be
+> correct, and the type system blocked whole classes of mistakes. The main rough edge is the
+> HTTP-status mapping story at the ASP boundary, which currently fights the framework's own
+> value-object guidance.
+>
+> I stored one reusable fact about the 422 binder seam since it'll bite any future Trellis build
+> with a 400-validation spec.
+
 ## Cross-model convergence (GPT-5.5 + opus-4.8)
 
-Two different frontier models, building the same service independently, agree on the core points
-— which is the strongest signal a qualitative account can give:
+Two different frontier models, building the same service independently across four runs, agree on
+the core points — which is the strongest signal a qualitative account can give:
 
 - **Guardrails/analyzers convert latent bugs into build-time errors** — both models, emphatically.
   opus *quantifies* it: TRLS001 caught **~17 fire-and-forget `Result`s** it would otherwise have
-  shipped silently.
+  shipped silently, and again flagged real dropped-error bugs in run 2.
 - **Value objects / explicit optionals prevent primitive-obsession and invalid states** — both.
 - **Scaffold/Todo-sample leftovers cost real time** — both (and gpt-5.5 run-2 *demonstrated* the
   failure by leaving the sample in; opus had to delete `AddMockDependencies`, idempotency, and
   Cosmos/KeyVault residue).
-- **`InvalidInput → 422` vs the commonly-expected `400`** — both, plus the harness (rubric D6).
+- **The `InvalidInput → 422` vs commonly-expected `400` story is the single most-cited friction —
+  named in all four with-Trellis runs**, plus the harness (rubric D6). opus run 2 pins the root
+  cause: the **value-object request-DTO binder seam returns a hardcoded 422 that `MapError(400)`
+  cannot override**, so a spec wanting 400 forces primitive DTOs — contradicting the framework's
+  own "value objects everywhere" guidance. This is the clearest, highest-confidence framework
+  improvement item the benchmark surfaced, and it is *why* the rubric's D6 accepts either code.
+- **The `[Consumes("application/json")]` → 415 trap** on body-less transition POSTs — opus, both
+  runs; "should be an analyzer, not prose."
 
 Most striking: **opus independently proposed this benchmark's most promising next measurement.**
 Unprompted, it said the benchmark "should measure … how many silent-bad-output classes were
