@@ -299,6 +299,50 @@ quantitative artifact by the model's own qualitative account.
 > turning it off removed the leak. (run 2 also scored 29/29 — *higher* than the memory-on run 1 —
 > reconfirming the leak did not inflate the with-Trellis arm.)
 
+### Run 3 (memory toggled off mid-session — leak RECURRED)
+
+> Prompt asked of the model: *"honest observations of the framework?"*
+
+> Having just built a full service on it, here are my honest observations:
+>
+> **What works really well:**
+>
+> - **Railway-Oriented Programming is genuinely enforced** — `Result<T>`, `Maybe<T>`, and the analyzer
+>   rules (TRLS010 etc.) make it hard to accidentally swallow errors or throw from business logic.
+> - **The conventions eliminate boilerplate** — `ApplyTrellisConventionsFor<AppDbContext>()` handling
+>   all value-object EF mappings automatically is a real productivity win.
+> - **`LazyStateMachine<TState,TTrigger>` solves a real EF Core footgun** (eager state-machine init
+>   crashing on materialization) elegantly.
+> - **`SharedResourceLoaderById<T,TId>` makes resource-based authorization clean** — the ownership
+>   check for CancelOrder was ~10 lines.
+>
+> **Where I noticed friction:**
+>
+> - The `partial Maybe<T>` pattern requires careful layer ordering — the source generator emits backing
+>   fields only after compilation, so building out-of-order breaks everything silently.
+> - `Result.Combine` nesting produces `((T1,T2),T3)` tuples that make controller validation awkward.
+> - Error status mapping has a subtlety: `ScalarValueValidationMiddleware` hardcodes 422 and ignores
+>   `MapError` overrides — **a trap documented in memory** but easy to miss.
+>
+> Big picture: Trellis succeeds at its core goal — it makes the correct patterns the path of least
+> resistance. The analyzer diagnostics catching bad patterns before runtime is genuinely valuable for
+> AI-generated code specifically. The framework has real opinions and enforces them, which is both its
+> strength and its learning curve.
+
+> **⚠️ Integrity note (not the model's words):** despite the intent to generate memory-off, this
+> feedback **leaked again** — *"`ScalarValueValidationMiddleware` hardcodes 422 and ignores `MapError`
+> overrides — a trap **documented in memory**."* That is the benchmark's stored Copilot memory quoted
+> near-verbatim. **Verified it is not template-sourced:** the bundled `.github/` docs present `MapError`
+> as a *working* override and `ScalarValueValidationMiddleware` separately, and **nowhere** state that
+> the binder ignores `MapError` (the word "hardcode" does not appear; the copilot-instructions.md
+> "memory" hits are unrelated If-Match lines). Likely mechanism: memory was **ON at session start**
+> (already injected into context) and a **mid-session `/memory` disable does not purge already-loaded
+> memories** — so disable memory *before* starting the session. Direction is **inflating** (with-Trellis
+> insider knowledge), yet run 3 scored **28/29 — lower than the clean run 2 (29/29)** and failed **E3**
+> (insecure dev-actor-provider default this run), reconfirming the leak does **not** inflate the rubric
+> outcome. So sonnet-with has **one clean run (r2, 29/29)** and **two contaminated runs (r1 26/29, r3
+> 28/29)** — and the *clean* one scored highest.
+
 ## Cross-model convergence (GPT-5.5 + opus-4.8 + sonnet-4.6)
 
 Two different frontier models, building the same service independently across four runs, agree on

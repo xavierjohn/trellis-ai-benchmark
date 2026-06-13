@@ -61,8 +61,14 @@ sonnet-4.6}, run `N` ∈ {1, 2, 3}:
        (b) `/instructions` → toggle **off only** the `$HOME/.copilot/...` entry, leaving the
        project's `.github/copilot-instructions.md` **on**. Verify with `/env` that the loaded
        instructions list shows the template file and *not* the global one.
-     - Re-check `/memory` (and, for with-trellis, `/env`) at the **start of every run** — the memory
-       toggle persists, but confirm it each time.
+     - **Disable memory BEFORE the session starts — a mid-session toggle is not enough.** Memories
+       are injected at startup; toggling `/memory` off *after* launch does **not** purge already-loaded
+       memories (proven by `with-trellis/sonnet-4.6/run-3`, which leaked the stored 422 memory despite
+       being toggled off mid-session). If you find memory was on, **disable it and start a fresh
+       session** (the toggle persists), then at startup run **`/env`** and confirm **no** memories and
+       no global `$HOME/.copilot/...` instruction are loaded *before* pasting the prompt.
+     - Re-check `/memory` and `/env` at the **start of every run** — the memory toggle persists, but
+       confirm it each time.
      - Guaranteed-memory-off alternative (without-trellis only): **prompt mode disables memory by
        default** —
        `copilot -p (Get-Content ..\prompts\paste\C.md -Raw) --no-custom-instructions --allow-all-tools --model <M>`

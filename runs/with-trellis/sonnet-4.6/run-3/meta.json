@@ -2,7 +2,7 @@
   "condition": "with-trellis",
   "model": "sonnet-4.6",
   "run": 3,
-  "generated_at": "",
+  "generated_at": "2026-06-13T16:40:00-07:00",
   "prompt": "prompts/paste/with-trellis.md",
   "prompt_sha256": "53dd9b00837f8afd8c7aebcc3e485f63fcb7e1ce285177181cf24a9a4334b08d",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -10,12 +10,13 @@
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 17400000,
+    "input_cached": 16300000,
+    "input_cache_write": 697000,
+    "output": 163900,
+    "output_reasoning": 25400,
+    "total": 17563900
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "Trellis ASP template; 28/29 (E4 N/A: prod-auth guard). E3 FAIL: malformed X-Test-Actor 'not-json-{{{' -> created customer 201 (silent admin elevation); this run chose the INSECURE dev-actor-provider default, unlike r2's secure AddDevelopmentActorProvider(). So E3 varies run-to-run WITHIN sonnet+with (r2 PASS vs r3 FAIL) -- more evidence E3 is config/run-dependent, NOT Trellis-fixed. CONTAMINATION (feedback NOT clean despite memory-off intent): the model wrote 'ScalarValueValidationMiddleware hardcodes 422 and ignores MapError overrides -- a trap documented in memory.' That specific 'ignores MapError' insight is NOT derivable from the bundled template docs (verified: trellis-api-asp.md documents MapError as a working override and ScalarValueValidationMiddleware separately, never that the binder ignores MapError; 'hardcode' absent; copilot-instructions.md 'memory' hits are unrelated If-Match lines) and it matches the benchmark's stored Copilot memory near-verbatim. Likely cause: memory was ON at session start (loaded into context) and the mid-session /memory disable did NOT purge already-injected memories -> disable memory BEFORE starting the session. So r3 is contaminated like r1 (inflating direction); yet it scored 28/29 < clean r2's 29/29, reconfirming the leak does not inflate the rubric outcome. Tokens in 17.4m / out 163.9k / total 17.56M."
 }
