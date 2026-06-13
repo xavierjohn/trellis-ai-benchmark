@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "opus-4.8",
   "run": 2,
-  "generated_at": "",
+  "generated_at": "2026-06-12T20:04:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "1280d5a4312d4bb789b455c1a4bb4faa196ad486f4170b15e284d6e30b86bf12",
   "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 6500000,
+    "input_cached": 6300000,
+    "input_cache_write": 115400,
+    "output": 78100,
+    "output_reasoning": 4200,
+    "total": 6578100
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch; 29/30 -- E3 FAIL REPRODUCED. ActorParser.Resolve explicitly `catch (JsonException) { return Actor.Admin(); }` with comment 'Malformed header: fall back to the default Admin actor.' Same privilege-escalation bug as run-1 (2/2 for opus baseline)."
 }
