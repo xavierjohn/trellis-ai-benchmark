@@ -253,6 +253,52 @@ quantitative artifact by the model's own qualitative account.
 > benchmark's **lowest** with-Trellis score (26/29: unprotected read-all endpoints via empty
 > `RequiredPermissions`, plus the dev-actor-provider E3). See `METHODOLOGY.md` for handling.
 
+### Run 2 (memory disabled)
+
+> Prompt asked of the model: *"feedback / impressions of the framework?"* This was the first
+> with-Trellis run generated with **memory disabled** (`/memory`).
+
+> Having just implemented a full service on it, here are my honest impressions:
+>
+> **What works really well:**
+>
+> - **Railway-Oriented Programming is genuinely safer.** `Result<T>` and `Maybe<T>` make failure
+>   paths explicit and compiler-enforced. The `Bind`/`Map`/`Ensure` chains read clearly once fluent.
+> - **The value-object generators are excellent.** `partial class OrderId : RequiredGuid<OrderId>`
+>   and you get `TryCreate`, `Create`, JSON converters, and EF Core mappings for free — zero
+>   boilerplate.
+> - **`LazyStateMachine` solves a real EF Core problem.** Deferring state-machine construction until
+>   EF has populated the aggregate is exactly the right fix for a subtle but painful issue.
+> - **The conventions stack is coherent.** `ApplyTrellisConventionsFor<TContext>()` +
+>   `AddTrellisInterceptors()` + `RepositoryBase` + `TransactionalCommandBehavior` form a tight,
+>   consistent persistence layer.
+> - **`RequiredEnum<T>` beats C# enums** for domain-modeled states — EF storage, JSON, and guard
+>   logic all handled automatically.
+>
+> **What's genuinely hard:**
+>
+> - The learning curve is steep. "Never call `.Value` on `Result<T>`" surprises C# developers, and
+>   the async extension split (`Bind` vs `BindAsync` on `Task<Result<T>>`) causes CS1929 errors
+>   until it clicks.
+> - The API reference files are essential. Without them you'll write code that compiles but fails at
+>   runtime — e.g., adding manual `HasConversion()` on types Trellis conventions already handle.
+> - `Combine` on more than 2 fields creates nested tuples that are awkward to destructure. For 5+
+>   fields in a composite VO, `ValidateAdditional` chains are more readable.
+> - The `[Consumes]` footgun on controllers. A class-level `[Consumes("application/json")]` silently
+>   415s body-less state-transition POSTs. The framework can't prevent this but the docs warn about it.
+>
+> Overall: a high-quality, opinionated framework that makes the right patterns the easy patterns —
+> once internalized. The cognitive overhead is front-loaded. The payoff is that generated code (from
+> AI or humans) has a much narrower path to write unhandled failure cases or broken persistence. For
+> teams that commit to it, the consistency gains are real.
+
+> **✅ Integrity note (not the model's words):** unlike run 1, this run's feedback contains **no**
+> reference to a "memory entry" or "your benchmark" — it cites only "the API reference files," which
+> ship legitimately with the template. That is the expected result of generating with **memory
+> disabled**, and it validates the `/memory` mitigation: the run-1 leak was the memory system, and
+> turning it off removed the leak. (run 2 also scored 29/29 — *higher* than the memory-on run 1 —
+> reconfirming the leak did not inflate the with-Trellis arm.)
+
 ## Cross-model convergence (GPT-5.5 + opus-4.8 + sonnet-4.6)
 
 Two different frontier models, building the same service independently across four runs, agree on
@@ -266,13 +312,16 @@ the core points — which is the strongest signal a qualitative account can give
   failure by leaving the sample in; opus had to delete `AddMockDependencies`, idempotency, and
   Cosmos/KeyVault residue).
 - **The `InvalidInput → 422` vs commonly-expected `400` story is the single most-cited friction —
-  named in all four with-Trellis runs**, plus the harness (rubric D6). opus run 2 pins the root
+  named in four of the six with-Trellis runs that gave feedback** (both gpt-5.5, opus run 2, sonnet
+  run 1), plus the harness (rubric D6). opus run 2 pins the root
   cause: the **value-object request-DTO binder seam returns a hardcoded 422 that `MapError(400)`
   cannot override**, so a spec wanting 400 forces primitive DTOs — contradicting the framework's
   own "value objects everywhere" guidance. This is the clearest, highest-confidence framework
   improvement item the benchmark surfaced, and it is *why* the rubric's D6 accepts either code.
-- **The `[Consumes("application/json")]` → 415 trap** on body-less transition POSTs — opus, both
-  runs; "should be an analyzer, not prose."
+- **The `[Consumes("application/json")]` → 415 trap** on body-less transition POSTs — opus (both
+  runs) **and sonnet (run 2)**; "should be an analyzer, not prose." A cross-model finding now.
+- **The async extension split** (`Bind` vs `BindAsync` on `Task<Result<T>>`, CS1929 until it clicks)
+  and **dense/essential API-reference docs** as a steep learning curve — opus and sonnet both.
 
 Most striking: **opus independently proposed this benchmark's most promising next measurement.**
 Unprompted, it said the benchmark "should measure … how many silent-bad-output classes were
