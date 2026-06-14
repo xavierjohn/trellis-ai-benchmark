@@ -127,6 +127,28 @@ in the model's own words — useful context alongside the (parity) scores.
 > instead of a 422. The Trellis railway-oriented approach makes that category of bug structurally
 > impossible. The tradeoff is exactly what your benchmark is designed to measure.
 
+## Verbatim — gpt-5.5, without-trellis (run 2)
+
+> Prompt asked of the model: *"how was the build / feedback on the spec?"* (30/30; memory off — the
+> conservative arm.)
+
+> It was a solid, realistic service build: enough scope to require real architecture choices, but
+> constrained enough to keep the implementation focused. The most interesting parts were enforcing the
+> order state machine cleanly, keeping inventory side effects correct on submit/cancel, and making the
+> API error/authorization behavior consistent across all endpoints.
+>
+> The trickiest bit was SQLite with `DateTimeOffset` for the overdue query; EF Core SQLite needs
+> explicit conversion for reliable comparisons. Otherwise, the spec was well-structured and testable,
+> which made it straightforward to drive toward a complete working service rather than a demo API.
+
+> **✅ Integrity note (not the model's words):** this baseline feedback is **clean** — no "Trellis",
+> "your benchmark", or insider reference, unlike the de-named sonnet baseline runs (which leaked "the
+> Trellis version"/"your benchmark"). gpt-5.5 showed **no** baseline Trellis-awareness. It independently
+> hit the **same SQLite `DateTimeOffset` overdue-query gotcha** reported by opus r3 and both sonnet
+> baseline runs — a **cross-model baseline pattern** driven by the spec's overdue query, not a
+> Trellis-vs-not signal. (Notably this is the run whose enum-int status serialization triggered
+> probe-fairness fix #5; the model itself did not flag it — it is invisible from inside the build.)
+
 ## A note on baseline "Trellis-awareness"
 
 sonnet's reflection references Trellis ("without Trellis", "with Trellis analyzers a missing check
