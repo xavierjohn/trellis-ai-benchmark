@@ -231,9 +231,28 @@ class Probe:
         return pid
 
     def _make_order(self, customer_id: str, product_id: str, qty: int = 1, actor: Any = None) -> str | None:
-        body = self._order_body(customer_id, [{"productId": product_id, "quantity": qty}])
-        r = self.req("POST", "/api/orders", actor=actor, json_body=body)
-        return self._find_id(r) if r.status_code == 201 else None
+        line = {"productId": product_id, "quantity": qty}
+        r = self.req("POST", "/api/orders", actor=actor, json_body=self._order_body(customer_id, [line]))
+        if r.status_code != 201:
+            return None
+        oid = self._find_id(r)
+        self._ensure_lines(oid, [line], actor=actor)
+        return oid
+
+    def _ensure_lines(self, order_id, lines, actor: Any = None) -> None:
+        """Guarantee the order carries its line items. Spec §6.4 puts line items inline in the
+        create-order body; a service may instead create an empty draft and require the spec's §6.5
+        add-line-item endpoint (POST /api/orders/{id}/line-items). If the created order has none,
+        add each line that way, so the lifecycle/stock/total criteria measure domain behaviour rather
+        than the create-order request shape. Re-adding is safe: §3 mandates duplicate-product
+        rejection, so an inline service that already has the line is left unchanged."""
+        if not order_id:
+            return
+        existing = self._line_items(self._json(self.req("GET", f"/api/orders/{order_id}", actor=actor)))
+        if existing:
+            return
+        for ln in lines:
+            self.req("POST", f"/api/orders/{order_id}/line-items", actor=actor, json_body=ln)
 
     @staticmethod
     def _order_body(customer_id, lines):
@@ -298,6 +317,7 @@ class Probe:
 
         # --- B4 / C8 / C7 : read order, total, duplicate-line-item ---
         if order:
+            self._ensure_lines(order, [{"productId": prod, "quantity": 2}])
             rget = self.req("GET", f"/api/orders/{order}")
             body = self._json(rget)
             self.record("B4", rget.status_code == 200 and body is not None,

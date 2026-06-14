@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "sonnet-4.6",
   "run": 3,
-  "generated_at": "",
+  "generated_at": "2026-06-13T19:10:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -17,5 +17,5 @@
     "total": null
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch (layered src/Domain/Application/Infrastructure/Api; OrderManagement.sln). 27/30. Generated under the OLD prompt (pre 'no subagents / no going above folder' rule) -> keeps prompt hash eca568fd. Scoring needed two GENERAL harness reproducibility fixes (committed separately): (1) a stray empty OrderManagement.slnx beside the real .sln made dotnet build the empty solution -> find_build_target now skips project-less solutions; (2) inherited the scoring machine's global NuGet 'C:\\nuget' feed -> added repo-root nuget.config (<clear/>+nuget.org). GENUINE fails: C6 (create-order DEVIATION: CreateOrderRequest takes ONLY customerId and creates an EMPTY draft, requiring the separate 6.5 add-line-item endpoint; spec 6.4 mandates inline 'customerId, list of (productId,quantity), >=1 required'; r3 also allows empty/qty0/qty1000 at create); C8 (order response exposes NO aggregate Total, only line items w/ UnitPrice+Quantity; spec treats Order Total as first-class); E3 (malformed X-Test-Actor -> admin, the recurring sonnet-baseline auth bug). Per the user's ROBUST/OUTCOME policy, the probe now builds orders via the spec's own 6.5 endpoint when inline create yields an empty order (arm-agnostic, additive -- 3 mandates duplicate rejection so inline runs are unaffected), so C1/C2/C3 (lifecycle/stock) test domain outcomes (r3's logic IS correct) not the create shape. C8 deliberately NOT computed from line items (robust = drive via spec endpoints, not fabricate outputs the service never returns). Tokens pending from operator."
 }
