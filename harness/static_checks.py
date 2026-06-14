@@ -20,13 +20,26 @@ def _run(cmd: list[str], cwd: Path, timeout: int = 1200) -> tuple[int, str]:
     return proc.returncode, (proc.stdout or "") + "\n" + (proc.stderr or "")
 
 
+def _solution_has_projects(sln: Path) -> bool:
+    """True if a solution file references at least one project. Skips a stray empty solution such
+    as a bare `<Solution></Solution>` .slnx that `dotnet build` would otherwise build to nothing."""
+    try:
+        return ".csproj" in sln.read_text(encoding="utf-8", errors="ignore").lower()
+    except OSError:
+        return False
+
+
 def find_build_target(run_dir: Path) -> Path | None:
-    """Prefer a solution file at/near the root; fall back to letting `dotnet` discover."""
+    """Prefer a solution file that actually references projects, .slnx before .sln, root before
+    nested. Skipping empty solutions avoids the trap where `dotnet build` picks a stray empty
+    .slnx (building nothing -> 'no web host project found') over the real .sln beside it."""
+    candidates: list[Path] = []
     for pat in ("*.slnx", "*.sln"):
-        hits = sorted(run_dir.glob(pat)) + sorted(run_dir.glob(f"**/{pat}"))
-        if hits:
-            return hits[0]
-    return None
+        candidates += sorted(run_dir.glob(pat)) + sorted(run_dir.glob(f"**/{pat}"))
+    non_empty = [s for s in candidates if _solution_has_projects(s)]
+    if non_empty:
+        return non_empty[0]
+    return candidates[0] if candidates else None
 
 
 def find_test_projects(run_dir: Path) -> list[Path]:
