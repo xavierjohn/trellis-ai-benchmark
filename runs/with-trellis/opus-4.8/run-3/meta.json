@@ -2,20 +2,21 @@
   "condition": "with-trellis",
   "model": "opus-4.8",
   "run": 3,
-  "generated_at": "",
+  "generated_at": "2026-06-13T22:40:00-07:00",
   "prompt": "prompts/paste/with-trellis.md",
-  "prompt_sha256": "a3ff1e0e29f8b4f67f5015c57a83f847af54295526bb18e1f5929a2d5874ac60",
+  "prompt_sha256": "53dd9b00837f8afd8c7aebcc3e485f63fcb7e1ce285177181cf24a9a4334b08d",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
   "template": "Trellis.AspTemplate 1.0.21-alpha",
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 35300000,
+    "input_cached": 34100000,
+    "input_cache_write": 1200000,
+    "output": 163100,
+    "output_reasoning": 11000,
+    "total": 35463100
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "Trellis ASP template; 28/29 (E4 N/A: prod-auth guard prevents Production boot). E3 FAIL: malformed X-Test-Actor 'not-json-{{{' -> created customer 201 (silent admin elevation) -- the opus-INTRINSIC E3 bug, identical to opus-with r1 & r2 and opus baseline (opus fails E3 in BOTH arms). So opus-with is PERFECTLY CONSISTENT: r1 28/29, r2 28/29, r3 28/29. PROMPT PROVENANCE: this generation was already in progress (its OrderManagement/ scaffold folder was present in the slot) BEFORE the prompt was updated with the 'no subagents / no parent folder' rules, so it used the OLD with-trellis paste prompt -> keeps the OLD hash 53dd9b00 (NOT the new a3ff1e0e; the rehash script had bumped it while it lacked a result.json). Slot artifacts cleaned at intake: empty nested OrderManagement/ dir (aborted scaffold) + run.log (operator's local EF run log) -- neither is generated source. Most expensive run in the benchmark: in 35.3m (34.1m cached) / out 163.1k / total 35.46M. Framework feedback pending from operator."
 }
