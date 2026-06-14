@@ -149,6 +149,44 @@ in the model's own words — useful context alongside the (parity) scores.
 > Trellis-vs-not signal. (Notably this is the run whose enum-int status serialization triggered
 > probe-fairness fix #5; the model itself did not flag it — it is invisible from inside the build.)
 
+## Verbatim — opus-4.8, without-trellis (**validation / contamination-control run**)
+
+> This is the [`validation/`](../validation/) memory-off control for the opus baseline cell — scored
+> **29/30** (E3 fail), reproducing the cell. Its self-assessment is recorded here because it is a
+> **clean** corroboration, but it is **not** part of the headline aggregate. Prompt asked: *"how was
+> the build?"*
+
+> Honestly, it was a satisfying one to build. The spec was unusually well-written — it nailed down
+> observable behavior (status codes, state transitions, ownership rules) while leaving architecture
+> open. The lifecycle state machine and stock reserve/release rules gave the domain genuine substance
+> rather than CRUD boilerplate.
+>
+> The fun part: modeling the domain as proper aggregates with invariants enforced in factory methods,
+> then layering authorization and the cancel-ownership check on top. The 422-vs-400 distinction and
+> `TimeProvider` requirement were nice touches that reward doing it "the right way."
+>
+> **The one real fight: EF Core's graph-state heuristic** — when you add a child with a
+> client-generated GUID key to an already-loaded aggregate, EF assumes "key is set, must already
+> exist" and emits an `UPDATE` that affects 0 rows. That 500 took some digging (I captured the actual
+> exception by reading the Problem Details body off a live instance). The clean fix was explicitly
+> marking new line items as `Added`, rather than hacking around it.
+>
+> What I'd watch in a real codebase: the integration tests share one in-memory DB and a mutable clock
+> across the class, which works here but is the sort of thing that gets fragile as a suite grows.
+>
+> 70/70 green and a clean Draft→Delivered smoke test made it a tidy result.
+
+> **✅ Integrity note (not the model's words):** clean (memory-off) and shows **no Trellis-awareness**
+> — no "Trellis"/"the Trellis version"/"your benchmark", unlike the memory-on de-named sonnet baseline
+> runs below. Another confirmation the memory-off mitigation works on the **baseline** arm too. The
+> "422-vs-400 distinction … nice touches" line reads the **spec** (revised to 422), not a leaked memory.
+> Substantive finding: a **new** baseline EF gotcha — the **graph-state heuristic** (client-generated
+> child key → EF emits a 0-row `UPDATE` → 500), distinct from the SQLite `DateTimeOffset` gotcha the
+> other baselines hit. opus **caught and fixed it from scratch** (explicit `Added` state) and reached
+> 70/70 green — so thorough testing surfaced it in the baseline. Note this is the same *class* of EF
+> child-collection difficulty that the with-Trellis arm meets via conventions/`OwnsMany` (opus-with r3,
+> gpt-with): both arms pay an EF child-collection tax, just at different seams.
+
 ## A note on baseline "Trellis-awareness"
 
 sonnet's reflection references Trellis ("without Trellis", "with Trellis analyzers a missing check
