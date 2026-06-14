@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "sonnet-4.6",
   "run": 3,
-  "evaluated_at": "2026-06-14T02:17:52.311854+00:00",
+  "evaluated_at": "2026-06-14T06:41:53.946432+00:00",
   "api_version": "2026-11-12",
   "score": {
     "passed": 27,
@@ -12,7 +12,7 @@
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "Microsoft.Extensions.Diagnostics.HealthChecks will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\sonnet-4.6\\run-3\\OrderManagement.sln]\nC:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\sonnet-4.6\\run-3\\src\\Api\\Api.csproj : warning NU1510: PackageReference Microsoft.Extensions.Diagnostics.HealthChecks will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.\n    2 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.94"
+      "evidence": "Microsoft.Extensions.Diagnostics.HealthChecks will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\sonnet-4.6\\run-3\\OrderManagement.sln]\nC:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\sonnet-4.6\\run-3\\src\\Api\\Api.csproj : warning NU1510: PackageReference Microsoft.Extensions.Diagnostics.HealthChecks will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.\n    2 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.44"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/95eac02f-ff4e-4ff3-b1b5-4ae43c722cd5?api-version=2026-11-12'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/6f467e5b-b480-4a24-a185-2e6edea5613e?api-version=2026-11-12'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/2b143ba7-ba4d-4e5e-95cb-764c84dd16e6?api-version=2026-11-12'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/a8997ce8-b6da-46b0-b0f9-988ffca27a06?api-version=2026-11-12'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/b0dc8ffc-ba41-4620-8173-aeb5a489cd09?api-version=2026-11-12'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/b03a644c-920b-4325-a4e2-78501689f65f?api-version=2026-11-12'"
     },
     "B4": {
       "pass": 1,

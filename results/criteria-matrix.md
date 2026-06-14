@@ -1,6 +1,6 @@
 # Per-criterion matrix
 
-_Generated 2026-06-14 06:08 UTC from 18 run(s)._
+_Generated 2026-06-14 06:42 UTC from 18 run(s)._
 
 Pass rate per criterion in each model × condition cell (averaged over runs).
 

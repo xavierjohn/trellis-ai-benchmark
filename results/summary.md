@@ -1,6 +1,6 @@
 # Headline results
 
-_Generated 2026-06-14 06:08 UTC from 18 run(s)._
+_Generated 2026-06-14 06:42 UTC from 18 run(s)._
 
 Each cell is the **mean pass rate over the 30 neutral criteria**, averaged across runs.
 Higher is better. Δ is the with-Trellis advantage in percentage points.
