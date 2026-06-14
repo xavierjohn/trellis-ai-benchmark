@@ -41,12 +41,12 @@ suites are correct essentially everywhere, in both arms. The entire signal lives
 | **E3** — malformed `X-Test-Actor` must not elevate to admin | w/o opus 33%, w/o sonnet 0%, **w/ gpt 67%, w/ opus 0%, w/ sonnet 33%**, w/o gpt 100% | The §5.5 test-actor header is parsed by **application / dev-provider** code; several models default a malformed header to an admin actor (a real privilege-escalation). On Trellis the usual cause is wiring `AddDevelopmentActorProvider` with a default-admin actor. | **No.** It fails *on Trellis too* — the parsing seam is app / dev-provider code, not a framework guardrail. **Model-dependent**, and (tellingly) gpt only started failing it once it built **idiomatically** with Trellis (see below). |
 | **E4** — no internal leak in Production | N/A for w/ opus, w/ sonnet | Their Trellis services refuse to boot in Production without real auth wired (a deliberate framework guard), so the no-leak check can't run and is excluded from the denominator. | This is Trellis being *stricter*, not a failure. |
 | **C6** — empty/out-of-range line items rejected at create | w/o sonnet 67% | One sonnet baseline run (`without/sonnet/r3`) creates an **empty draft order** and only adds items via a separate endpoint, so create-time line-item validation is absent. | A spec-deviation in one from-scratch run. |
-| **E2** — cancel ownership enforced | w/o gpt 67% | One gpt baseline run (`without/gpt/r3`) **deterministically hangs** on owner self-cancellation and wedges the server (an effective DoS). | A genuine runtime reliability bug — see §3. |
+| **E2** — cancel ownership enforced | w/o gpt 67% | One gpt baseline run (`without/gpt/r3`) **deterministically hangs** on owner self-cancellation and wedges the server (an effective DoS). | A genuine runtime reliability bug — see §4. |
 | **D6 / E5** — consistent status mapping / read-all enforced | w/ sonnet 67% each | One sonnet *Trellis* run (`with/sonnet/r1`) left read-all endpoints unprotected (empty `RequiredPermissions`) and mapped a status inconsistently. | A real authz bug — Trellis did **not** prevent it here (the permission list was simply left empty). |
 
 The dominant differentiator is **E3**, and it lives in **application / dev-provider code, not a
 framework guardrail** — so it fails *on Trellis too*. The sharpest illustration came from re-checking
-idiom usage (see §6): the original `with-trellis/gpt-5.5/run-1` had scaffolded the template but written
+idiom usage (see §7): the original `with-trellis/gpt-5.5/run-1` had scaffolded the template but written
 largely *plain C#* (manual, secure actor parsing) and scored a clean **30/30**. Re-generated to build
 **idiomatically** with Trellis, the *same model on the same task* scored **28/29** — it now **fails
 E3** (the idiomatic `AddDevelopmentActorProvider` defaults a malformed actor to admin) and **E4 becomes
@@ -55,7 +55,39 @@ adopting Trellis *idiomatically* here **cost** gpt rubric points rather than win
 striking, honest data point: it both reinforces the parity headline and shows the value (the prod-auth
 guard, the explicit dev-actor seam) is about *structure and strictness*, not a higher score.
 
-## 3. What the rubric can't see — and why it matters
+## 3. Consistency: Trellis steadies the *structure*, not the *score*
+
+"Are the three runs in a cell consistent?" depends on *which* consistency — and it is **not** uniform
+across models ([`harness/consistency.py`](harness/consistency.py)):
+
+| cell | run scores | rate range | `.cs` files (r1/r2/r3) | projects | idiom |
+|---|---|---|---|---|---|
+| with / gpt-5.5 | 28/29, 30/30, 30/30 | 96.6–100 | 51 / 82 / 38 | 8/8/8 | idiomatic |
+| with / opus-4.8 | 28/29 ×3 | **96.6 (flat)** | 81 / 84 / 73 | 8/8/8 | idiomatic |
+| with / sonnet-4.6 | 26/29, 29/29, 28/29 | **89.7–100** | 120 / 126 / 92 | 8/8/8 | idiomatic |
+| without / gpt-5.5 | 30/30, 30/30, 29/30 | 96.7–100 | **8 / 2 / 4** | 2/2/2 | — |
+| without / opus-4.8 | 29/30, 29/30, 30/30 | 96.7–100 | 43 / 38 / 48 | 5/7/5 | — |
+| without / sonnet-4.6 | 29/30, 29/30, 28/30 | 93.3–96.7 | 40 / 31 / 43 | **2 / 5 / 7** | — |
+
+- **Structural consistency → Trellis wins decisively.** Every with-Trellis run ships the *same
+  8-project layered skeleton* (the template imposes it). Without Trellis, architecture is free-form —
+  **sonnet alone shipped 2, 5, and 7 projects** across its three baseline runs; gpt stayed minimal
+  (always 2). Trellis makes the skeleton uniform.
+- **…but code volume still varies within it.** gpt-with ranged **38 → 82 `.cs` files** — the template
+  fixes the *structure*, not how much the model writes inside it.
+- **Score consistency → model-driven, not arm-driven.** The steadiest cell in the whole study is
+  **opus with-Trellis (28/29 ×3, zero variance)**; the most variable is **sonnet with-Trellis
+  (89.7–100)**. Both arms otherwise show ~3-point run-to-run dips from a single run-specific bug.
+- **Idiom consistency → not uniform across models.** opus and sonnet built idiomatically in **all
+  three** runs; **gpt did not** (1 of 3 came out `template-only`, since re-generated — see §7).
+  Handing a model the template does not guarantee uniform adoption.
+
+**Takeaway:** Trellis substantially improves **architectural** consistency (uniform skeleton, mostly-
+uniform idioms); **outcome-score** consistency is governed by the *model* (opus steadiest, sonnet most
+variable), roughly the same with or without the framework. (n=3 per cell — directional, not a variance
+statistic.)
+
+## 4. What the rubric can't see — and why it matters
 
 The rubric scores the *final, working, fully-tested* service. On a complete spec with a thorough test
 suite, many latent bugs get caught **before** scoring — by the model's own tests — so they never
@@ -88,7 +120,7 @@ same mechanism ([`findings/model-feedback.md`](findings/model-feedback.md)):
 Trellis's own summary, in the models' words: it **narrows the path to writing unhandled failure cases
 or broken persistence** — most valuable exactly where a test suite *isn't* exhaustive.
 
-## 4. A finding that cuts the other way: the most-cited friction is spec-dependent
+## 5. A finding that cuts the other way: the most-cited friction is spec-dependent
 
 Across the feedback, the single most-named rough edge was *"Trellis maps validation to **422**, but my
 spec wanted **400**."* The benchmark's spec was later revised to map validation to **422** (RFC 9110
@@ -99,7 +131,7 @@ default. (The rubric accepts either `400` or `422` for validation, so this never
 is still a genuine underlying sharp edge worth fixing — the value-object request-DTO binder hardcodes
 422 and ignores `MapError(400)` — filed as [`findings/framework-issue-422-binder-seam.md`](findings/framework-issue-422-binder-seam.md).
 
-## 5. Cost: Trellis is markedly more expensive to generate
+## 6. Cost: Trellis is markedly more expensive to generate
 
 Mean tokens to produce one working service ([`results/summary.md`](results/summary.md)). `output`
 (generated work) is the most comparable signal; `input` is dominated by the identical, mostly-cached
@@ -116,7 +148,7 @@ read the bundled API references, follow the layered structure, and satisfy the a
 real, measured trade-off: **more generation cost now, in exchange for a narrower path to latent bugs
 later.** Whether that trade is worth it depends on how well-tested and how long-lived the code is.
 
-## 6. Honesty about the experiment (threats to validity)
+## 7. Honesty about the experiment (threats to validity)
 
 Full treatment in [`METHODOLOGY.md`](METHODOLOGY.md); the load-bearing ones:
 
@@ -146,7 +178,7 @@ Full treatment in [`METHODOLOGY.md`](METHODOLOGY.md); the load-bearing ones:
 - **n is small** (3 runs × 3 models × 2 arms). This is a credibility study, not a powered statistical
   claim. The artifacts are all here to re-score, re-run, or disagree.
 
-## 7. Read the evidence yourself
+## 8. Read the evidence yourself
 
 - Per-run scores and provenance: each `runs/<arm>/<model>/run-N/result.json` + `meta.json`
 - The exact black-box checks: [`harness/probe.py`](harness/probe.py)
