@@ -1,6 +1,6 @@
 # Headline results
 
-_Generated 2026-06-13 23:50 UTC from 14 run(s)._
+_Generated 2026-06-14 01:49 UTC from 15 run(s)._
 
 Each cell is the **mean pass rate over the 30 neutral criteria**, averaged across runs.
 Higher is better. Δ is the with-Trellis advantage in percentage points.
@@ -10,7 +10,7 @@ Higher is better. Δ is the with-Trellis advantage in percentage points.
 | gpt-5.5 | 100% | 100% | +0 |
 | opus-4.8 | 98% | 97% | -1 |
 | sonnet-4.6 | 97% | 95% | -1 |
-| **All models** | **98%** | **97%** | **-0** |
+| **All models** | **98%** | **97%** | **-1** |
 
 ### Generation cost (tokens per service)
 
@@ -20,7 +20,7 @@ comparable signal across arms, since `input` is dominated by the identical paste
 
 | Model | Without: output | Without: total | With: output | With: total |
 |---|---|---|---|---|
-| gpt-5.5 | 19.3k | 916.4k | 36.8k | 5.94M |
+| gpt-5.5 | 19.3k | 1.22M | 36.8k | 5.94M |
 | opus-4.8 | 77.1k | 8.11M | 184.8k | 36.48M |
 | sonnet-4.6 | 59.4k | 5.16M | 184.1k | 16.92M |
 

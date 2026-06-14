@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "gpt-5.5",
   "run": 2,
-  "generated_at": "",
+  "generated_at": "2026-06-13T18:40:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 1500000,
+    "input_cached": 1400000,
+    "input_cache_write": null,
+    "output": 19300,
+    "output_reasoning": 2900,
+    "total": 1519300
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch (2-project: OrderManagement.Api single-file Program.cs + OrderManagement.Tests); 30/30 PERFECT (E3 PASS -- gpt-5.5 parses X-Test-Actor securely, no malformed->admin; E4 prod-leak check passed). Initially scored 29/30 on a FALSE C1 fail: this run serializes OrderStatus as the ENUM INT (no JsonStringEnumConverter; OrderResponse.Status is the enum, Delivered=4), so the probe read final status as ''. The lifecycle is genuinely correct (all transitions 200; C2/C3 stock reserve/release passed; EnumToStringConverter stores status as string in the DB per spec 8). Rubric C1 scores the transition HTTP statuses, not the response status field's TYPE, and the spec only mandates string STORAGE -> 5th probe-fairness fix: _status_of() now decodes an int/numeric status via the spec-2 canonical order (Draft..Cancelled); arm-agnostic, additive (string-status runs unaffected). Re-scored 30/30. Cheapest run so far: in 1.5m / out 19.3k / total 1.52M. (Baseline arm: contamination would be conservative; no feedback collected this run.)"
 }

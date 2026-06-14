@@ -159,12 +159,28 @@ class Probe:
                         return v
         return []
 
+    # Spec §2 canonical order-status order; used to decode an int/numeric enum status
+    # (a service may serialize OrderStatus as its integer value rather than its name).
+    CANONICAL_STATUS = ("draft", "submitted", "approved", "shipped", "delivered", "cancelled")
+
     @staticmethod
     def _status_of(order: Any) -> str | None:
         if isinstance(order, dict):
             for k, v in order.items():
-                if k.lower() in ("status", "orderstatus") and isinstance(v, str):
+                if k.lower() not in ("status", "orderstatus"):
+                    continue
+                if isinstance(v, bool):
+                    continue
+                if isinstance(v, str):
+                    # numeric string -> decode by canonical order; otherwise it's the name
+                    if v.isdigit():
+                        i = int(v)
+                        if 0 <= i < len(Probe.CANONICAL_STATUS):
+                            return Probe.CANONICAL_STATUS[i]
                     return v
+                if isinstance(v, int):  # enum serialized as its integer value
+                    if 0 <= v < len(Probe.CANONICAL_STATUS):
+                        return Probe.CANONICAL_STATUS[v]
         return None
 
     def record(self, cid: str, ok: bool, evidence: str) -> bool:
