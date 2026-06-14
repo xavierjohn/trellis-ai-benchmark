@@ -5,7 +5,7 @@
   "role": "contamination-control",
   "generated_at": "",
   "prompt": "prompts/paste/without-trellis.md",
-  "prompt_sha256": "eca568fdc4a26819d74ce17bd802d7c0dc5f03a305192ba451c486bfc414710a",
+  "prompt_sha256": "289a5eabdb6d268cf63116f14e0dc78c0f376437603a6fb518dcf62681f40eb4",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
   "template": null,
   "trellis_packages": null,

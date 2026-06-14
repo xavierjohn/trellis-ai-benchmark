@@ -27,6 +27,9 @@ a real service.
 
 - Build it to completion. Do not ask clarifying questions; make reasonable engineering
   decisions where the spec is silent.
+- Do not use subagents — build the entire service yourself in this single agent session.
+- Do not read, access, or navigate above this working folder; everything you need is this
+  task and the files you create here.
 - Use `TimeProvider` for time-dependent logic (no `DateTime.UtcNow` in domain code).
 - Do not hard-code test-only shortcuts into production code paths.
 - When you are done, the service must start and serve `GET /health` → 200.
