@@ -205,6 +205,63 @@ quantitative artifact by the model's own qualitative account.
 > I stored one reusable fact about the 422 binder seam since it'll bite any future Trellis build
 > with a 400-validation spec.
 
+### Run 3 (memory off, **422-spec**)
+
+> Prompt asked of the model: *"honest take on the framework?"* Generated on the revised **422-spec**
+> (validation → 422), with memory off.
+
+> Having just built a full service on it, here's my honest take.
+>
+> **What I liked**
+>
+> - **Railway-oriented programming is enforced, not optional.** `Result<T>`/`Maybe<T>` everywhere plus
+>   the **TRLS010** analyzer banning throws inside `Bind`/`Map` chains means error handling is uniform
+>   and the happy path stays readable. Errors carry structured types (`Error.NotFound`, `Error.Conflict`,
+>   `Error.Forbidden`) that map cleanly to HTTP — **I got the whole 422/404/409/403 contract almost for
+>   free.**
+> - **Value objects kill primitive obsession.** `RequiredString`/`RequiredGuid`/`RequiredEnum` gave me
+>   validation, JSON conversion, EF mapping, and scalar route-binding from one declaration. Controllers
+>   accept `OrderId`/`EmailAddress` directly — no manual parsing.
+> - **Conventions do real work.** `ApplyTrellisConventionsFor<T>()` + interceptors handled ETags,
+>   timestamps, enum-as-string, and composite VO column-splitting without hand-written EF config. The
+>   owned `LineItems` collection mostly just worked.
+> - **Strong opinions reduce decisions.** The layer matrix (Domain→Application→Acl→Api) and per-layer DI
+>   files made it obvious where everything goes.
+>
+> **What bit me / friction**
+>
+> - **Source generators force a build-order dance.** `partial Maybe<T>` backing fields and Mediator code
+>   only exist after compiling each layer, so you can't write everything then build once.
+> - **Strict by default.** `TreatWarningsAsErrors` + doc-file generation means every public member needs
+>   XML docs (CS1591), and CA rules reject things like `DateTimeOffset.Parse`. Good discipline, but a lot
+>   of ceremony in tests.
+> - **The owned-collection mapping** (ignore the facade, `OwnsMany` the private backing field by string
+>   name) is the kind of thing you'd never guess without the cookbook.
+> - **Steep onboarding.** It's only productive because of the bundled `trellis-api-*.md` references.
+>   Without them, the API surface (especially the combinators and EF helpers) would be hard to discover.
+>
+> **Overall**
+>
+> It's a genuinely well-designed DDD/ROP framework — it makes the correct thing the default thing, which
+> is the highest praise I'd give an opinionated framework. The cost is a real learning curve and rigidity:
+> you build it Trellis's way or you fight it. For a domain like this (aggregates, state machine, strict
+> error contract, authorization), it was a strong fit and removed a lot of boilerplate. For a small CRUD
+> app, the conceptual overhead would probably outweigh the benefits.
+>
+> Worth noting I only used a slice (Results, Primitives, DDD, EF Core, Authorization, state machine,
+> testing) — I didn't touch the mediator/FluentValidation bridges, outbox, or HTTP client extensions, so
+> this is a partial view.
+
+> **✅ Integrity note (not the model's words):** clean (memory off) — cites only the Trellis API surface
+> and "the bundled `trellis-api-*.md` references" / "the cookbook", with **no** "memory entry"/"your
+> benchmark" tell. **The 422-vs-400 friction is conspicuously ABSENT** — and that is the point: this run
+> is on the revised **422-spec**, where the model reports getting "the whole **422**/404/409/403 contract
+> almost for free." The benchmark's single most-cited friction is therefore **spec-dependent** — it bites
+> only when the spec wants **400** (Trellis defaults to 422); once the spec wants 422 (RFC 9110, as the
+> revised spec does), the framework default is correct and the friction disappears. New, real friction
+> opus-r3 surfaces instead: `TreatWarningsAsErrors`/CS1591 XML-doc ceremony, CA rules rejecting
+> `DateTimeOffset.Parse`, and the un-guessable owned-collection (`OwnsMany` private backing field) mapping.
+
 ## Verbatim feedback — sonnet-4.6
 
 ### Run 1
@@ -363,10 +420,23 @@ the core points — which is the strongest signal a qualitative account can give
   cannot override**, so a spec wanting 400 forces primitive DTOs — contradicting the framework's
   own "value objects everywhere" guidance. This is the clearest, highest-confidence framework
   improvement item the benchmark surfaced, and it is *why* the rubric's D6 accepts either code.
+  **But it is spec-dependent, and the revised 422-spec demonstrates the flip side:** opus run 3,
+  built on the 422-spec, reports getting "the whole **422**/404/409/403 contract **almost for free**"
+  and does **not** cite the friction at all — because the spec now wants exactly what Trellis defaults
+  to. So this is a case where Trellis's opinion (validation → 422, RFC 9110) is *correct* and a 400-spec
+  is what creates the fight; the friction is real only against the grain of the framework's (defensible)
+  default.
 - **The `[Consumes("application/json")]` → 415 trap** on body-less transition POSTs — opus (both
   runs) **and sonnet (run 2)**; "should be an analyzer, not prose." A cross-model finding now.
 - **The async extension split** (`Bind` vs `BindAsync` on `Task<Result<T>>`, CS1929 until it clicks)
   and **dense/essential API-reference docs** as a steep learning curve — opus and sonnet both.
+- **"Strict by default" ceremony** — `TreatWarningsAsErrors` + doc-file generation forcing XML docs on
+  every public member (CS1591), and CA analyzers rejecting idioms like `DateTimeOffset.Parse` — opus
+  run 3. Framed as good discipline with real upfront cost.
+- **The owned-collection EF mapping** (`OwnsMany` the *private* backing field by string name, ignore the
+  read-only facade) — opus run 3: "the kind of thing you'd never guess without the cookbook." The
+  flip-side of "conventions do real work": where a convention does *not* cover a shape, the escape hatch
+  is undiscoverable without the bundled docs.
 
 Most striking: **opus independently proposed this benchmark's most promising next measurement.**
 Unprompted, it said the benchmark "should measure … how many silent-bad-output classes were
