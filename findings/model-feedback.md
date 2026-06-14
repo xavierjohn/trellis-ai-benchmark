@@ -53,6 +53,57 @@ session that built the service.
 >    narrowing the space of acceptable code so generated implementations fail loudly instead of
 >    becoming subtle runtime bugs.
 
+> **⚠️ Provenance note (not the model's words):** the Run 1 *source* this feedback came from was
+> later found to be **`template-only`** by the idiom diagnostic — it scaffolded the template but
+> shipped largely plain C# (no value objects, no `Maybe<T>`, no Mediator; see METHODOLOGY "Adoption ≠
+> idiomatic use"), and was **re-generated** into a genuinely idiomatic build. The original feedback is
+> kept verbatim — and is itself telling: it praises idiomatic features (`Maybe.Value` analyzer, EF
+> `Maybe` query shape, backing-collection mapping) that the final template-only code **didn't actually
+> use**, i.e. the model *learned* the patterns from the docs/analyzers without *applying* them. The
+> re-generated run-1's feedback follows.
+
+### Run 1 (re-generated — idiomatic, memory-off, 422-spec)
+
+> Prompt asked of the model: *"feedback on Trellis after implementing this service?"*
+
+> **Strong points**
+>
+> - The `Result<T>` / `Maybe<T>` model is effective for keeping expected failures explicit and avoiding
+>   exception-driven business flow.
+> - Scalar value objects (`RequiredString<T>`, `RequiredGuid<T>`, `RequiredEnum<T>`, primitives like
+>   `EmailAddress`, `Money`) make API/domain boundaries much safer.
+> - The ASP.NET result mapping is productive once wired: domain errors naturally become Problem Details
+>   with the right HTTP status.
+> - EF Core conventions and interceptors remove a lot of boilerplate for scalar VOs, timestamps, ETags,
+>   and `Maybe<T>`.
+> - The testing helpers (`BeSuccess`, `BeFailureOfType`, `Unwrap`) are useful and encourage the same
+>   result semantics in tests.
+>
+> **Friction points**
+>
+> - The API surface is large and easy to misuse without reading the references first; the docs are
+>   necessary, not optional.
+> - Some generated/convention-based EF behavior is non-obvious, especially backing fields, `Maybe<T>`,
+>   and read-only collection mapping.
+> - Analyzer rules are helpful but can feel strict during implementation, especially around
+>   `Maybe.Value` and XML docs.
+> - The framework rewards following the template closely; diverging from the intended patterns can
+>   create confusing compile/runtime errors.
+> - There's a learning curve around choosing the right combinator (`Bind`, `Check`, `Tap`, `Map`, async
+>   variants) for handler flows.
+>
+> Overall: Trellis gives strong correctness rails for domain-heavy APIs, but it's best suited to teams
+> willing to adopt its conventions consistently. The payoff is good type safety and uniform error/HTTP
+> behavior; the cost is up-front framework literacy.
+
+> **✅ Integrity note (not the model's words):** clean (memory-off) — cites only the Trellis API surface
+> and "the references," no "memory entry"/"your benchmark" tell. **No 422-vs-400 friction** (this run is
+> on the 422-spec) — a *third* independent confirmation, after opus run 3 and the gpt validation run,
+> that the friction is **spec-dependent**. The read-only-collection / backing-field EF friction and the
+> combinator-choice (`Bind`/`Check`/`Tap`/`Map`/async) learning curve corroborate opus runs 2–3 and
+> sonnet. This idiomatic build scored **28/29** — *lower* than the template-only original's 30/30
+> (E3 via the idiomatic dev-actor-provider, E4 N/A via the prod-auth guard; see RESULTS §2).
+
 ### Run 2
 
 > Trellis gave strong guardrails, but the template/API surface still has some friction.
