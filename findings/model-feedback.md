@@ -102,6 +102,48 @@ The model both **committed** the mistake and, asked separately, **diagnosed** it
 the fix (a "replace Todo with your domain" generator mode). A clean corroboration of a
 quantitative artifact by the model's own qualitative account.
 
+### Validation run (memory-off contamination control, 422-spec)
+
+> This is the [`validation/`](../validation/) contamination-control run for the GPT-5.5 with-Trellis
+> cell — generated memory-off on the 422-spec, scored **30/30** (reproducing the headline cell). Its
+> feedback is recorded here because it is a **clean** corroboration, but it is **not** part of the
+> headline aggregate. Prompt asked: *"feedback on the framework?"*
+
+> Trellis feels strong for domain-heavy CRUD/services where correctness, explicit failures, and
+> consistent HTTP semantics matter. The framework's biggest wins are `Result<T>`/`Maybe<T>`, scalar
+> value objects, built-in authorization patterns, source-generated EF conventions, and automatic
+> Problem Details mapping. Once patterns are followed, the layers stay clean and build-time analyzers
+> catch real mistakes early.
+>
+> My main feedback: the framework is powerful but strict and documentation-dependent. Small
+> deviations — EF mapping for composite value objects, missing `Include` for child collections, or
+> unsafe `Maybe.Value` access — surface quickly as analyzer/build/runtime issues. That's good for
+> quality, but it raises the learning curve. The API references are essential, not optional.
+>
+> Specific positives: excellent type-safety for IDs, enums, validation, optional values; good
+> alignment between domain errors and HTTP Problem Details; expressive authorization (esp. resource
+> ownership); EF conventions/interceptors reduce boilerplate when used exactly right; analyzers
+> genuinely prevented unsafe code.
+>
+> Potential improvements: more concise end-to-end examples for composite value objects and
+> backing-field collections; clearer diagnostics when EF conventions don't discover a value object;
+> more discoverable "happy path" templates for aggregate + child-collection scenarios; **a
+> lower-friction way to wire test actor headers without custom provider code.**
+>
+> Overall: Trellis is opinionated in a good way. It rewards precise, layered implementation and is
+> well-suited for services where business invariants matter more than quick scaffolding.
+
+> **✅ Integrity note (not the model's words):** clean (memory-off) — cites only the Trellis API
+> surface and "the API references," with **no** "memory entry"/"your benchmark" tell. Two corroborations
+> of headline findings: (1) like opus run 3 (also 422-spec), it cites **no** 422-vs-400 friction —
+> instead praising "consistent HTTP semantics" and "alignment between domain errors and HTTP Problem
+> Details" — reconfirming that friction is **spec-dependent** (gone when the spec wants 422). (2) The
+> EF composite-VO / missing-`Include` / convention-discovery friction matches opus runs 2–3 and the
+> GPT headline runs — a cross-model, cross-arm-consistent rough edge. New, concrete ask: **"a
+> lower-friction way to wire test actor headers without custom provider code"** — the §5.5 `X-Test-Actor`
+> convention requires hand-written `IActorProvider` code, which is exactly where the **E3** privilege-
+> escalation bug lives across runs (the framework gives no built-in test-actor seam).
+
 ## Verbatim feedback — opus-4.8
 
 ### Run 1
