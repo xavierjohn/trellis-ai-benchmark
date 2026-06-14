@@ -18,5 +18,32 @@
     "total": 34684300
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 28/29, same profile as run-1. E3 FAIL (consistent 2/2 with-trellis): AddDevelopmentActorProvider(DefaultPermissions=All) resolves a malformed X-Test-Actor to default admin in DEV. E4 N/A: throws in Production without real auth (AddEntraActorProvider) = prod guard, so the dev E3 weakness cannot ship to prod. 87 tests. in 34.5m / out 184.3k."
+  "notes": "Trellis ASP template; 28/29, same profile as run-1. E3 FAIL (consistent 2/2 with-trellis): AddDevelopmentActorProvider(DefaultPermissions=All) resolves a malformed X-Test-Actor to default admin in DEV. E4 N/A: throws in Production without real auth (AddEntraActorProvider) = prod guard, so the dev E3 weakness cannot ship to prod. 87 tests. in 34.5m / out 184.3k.",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 10,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediatr_handlers": 14,
+      "mediatr_dispatch": 6,
+      "authorize": 15,
+      "maybe": 17,
+      "result": 105,
+      "ef_conventions": 3
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 7
+    },
+    "cs_files": 84
+  }
 }

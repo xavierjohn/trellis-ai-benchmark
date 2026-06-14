@@ -18,5 +18,32 @@
     "total": 12210700
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 26/29 = LOWEST with-trellis score. GENUINE authz bugs: E5 -- ListOverdueOrdersQuery & ListOrdersByCustomerQuery declare IAuthorize but with RequiredPermissions=Array.Empty<string>(), so the read-all endpoints are UNPROTECTED (read-only caller gets 200, should be 403); D6 fails as a consequence (forbidden=[200,403]). E3 fail: Trellis dev actor provider -> malformed X-Test-Actor -> admin. E4 N/A (prod-auth guard throws). Left the Todo sample (TodosController coexists). MEMORY CONTAMINATION CONFIRMED: feedback quotes the stored memory ('copilot instructions even dedicate a memory entry to it -- use primitive DTOs to get spec-mandated 400') -> this with-trellis run had memory/instructions LOADED (inflating direction for the with-trellis arm). out 110.7k tok."
+  "notes": "Trellis ASP template; 26/29 = LOWEST with-trellis score. GENUINE authz bugs: E5 -- ListOverdueOrdersQuery & ListOrdersByCustomerQuery declare IAuthorize but with RequiredPermissions=Array.Empty<string>(), so the read-all endpoints are UNPROTECTED (read-only caller gets 200, should be 403); D6 fails as a consequence (forbidden=[200,403]). E3 fail: Trellis dev actor provider -> malformed X-Test-Actor -> admin. E4 N/A (prod-auth guard throws). Left the Todo sample (TodosController coexists). MEMORY CONTAMINATION CONFIRMED: feedback quotes the stored memory ('copilot instructions even dedicate a memory entry to it -- use primitive DTOs to get spec-mandated 400') -> this with-trellis run had memory/instructions LOADED (inflating direction for the with-trellis arm). out 110.7k tok.",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 9,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediatr_handlers": 14,
+      "mediatr_dispatch": 53,
+      "authorize": 18,
+      "maybe": 28,
+      "result": 113,
+      "ef_conventions": 3
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 9
+    },
+    "cs_files": 120
+  }
 }

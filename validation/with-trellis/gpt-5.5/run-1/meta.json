@@ -19,5 +19,32 @@
     "total": 7533800
   },
   "generator": "manual clean-room",
-  "notes": "CONTAMINATION CONTROL (not in the headline 3-run aggregate; lives under validation/ which aggregate.py does not glob). Memory-DISABLED clean repeat of the with-trellis x gpt-5.5 cell, whose headline runs r1-r3 were all generated memory-ON. RESULT: 30/30 -- EXACTLY reproduces the contaminated headline cell (gpt-with r1/r2/r3 all 30/30). Positive contamination-control signal: the memory leak did NOT move this cell. Per-arm isolation: memory off (persisted) + KEPT the template's project .github/copilot-instructions.md, suppressed only the global $HOME/.copilot file; generated under the NEW prompt (no subagents / no parent folder) -> hash a3ff1e0e. Generated on the 422-spec (rubric-neutral; D-criteria accept 400 or 422). Tokens in 7.5m / out 33.8k / total 7.53M. Framework feedback CAPTURED in findings/model-feedback.md and MEMORY-CLEAN (cites only Trellis API surface + 'the API references'; no 'memory entry'/'your benchmark' tell). Like opus-with r3 (also 422-spec) it cites NO 422-vs-400 friction (praises 'consistent HTTP semantics') -> friction is spec-dependent. New ask: 'a lower-friction way to wire test actor headers without custom provider code' -- the X-Test-Actor convention requires hand-written IActorProvider, exactly where the E3 bug lives across runs."
+  "notes": "CONTAMINATION CONTROL (not in the headline 3-run aggregate; lives under validation/ which aggregate.py does not glob). Memory-DISABLED clean repeat of the with-trellis x gpt-5.5 cell, whose headline runs r1-r3 were all generated memory-ON. RESULT: 30/30 -- EXACTLY reproduces the contaminated headline cell (gpt-with r1/r2/r3 all 30/30). Positive contamination-control signal: the memory leak did NOT move this cell. Per-arm isolation: memory off (persisted) + KEPT the template's project .github/copilot-instructions.md, suppressed only the global $HOME/.copilot file; generated under the NEW prompt (no subagents / no parent folder) -> hash a3ff1e0e. Generated on the 422-spec (rubric-neutral; D-criteria accept 400 or 422). Tokens in 7.5m / out 33.8k / total 7.53M. Framework feedback CAPTURED in findings/model-feedback.md and MEMORY-CLEAN (cites only Trellis API surface + 'the API references'; no 'memory entry'/'your benchmark' tell). Like opus-with r3 (also 422-spec) it cites NO 422-vs-400 friction (praises 'consistent HTTP semantics') -> friction is spec-dependent. New ask: 'a lower-friction way to wire test actor headers without custom provider code' -- the X-Test-Actor convention requires hand-written IActorProvider, exactly where the E3 bug lives across runs.",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 12,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediatr_handlers": 14,
+      "mediatr_dispatch": 3,
+      "authorize": 16,
+      "maybe": 16,
+      "result": 99,
+      "ef_conventions": 2
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 5
+    },
+    "cs_files": 55
+  }
 }

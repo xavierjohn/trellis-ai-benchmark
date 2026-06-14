@@ -18,5 +18,32 @@
     "total": 38285200
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 28/29 (E4 N/A: DependencyInjection throws in Production without real auth configured -- a deliberate prod guard, not a crash). One genuine fail: E3 -- uses Trellis AddDevelopmentActorProvider(DefaultPermissions=All); a malformed X-Test-Actor resolves to default admin (201) = silent elevation. SAME E3 outcome as opus's from-scratch arm => E3 is MODEL-dependent, Trellis did not prevent it (X-Test-Actor parsing is app/dev-provider code). Product field named 'name' (not productName) -> probe alias fix. Most expensive run: in 38.1m / out 185.2k; 78 tests."
+  "notes": "Trellis ASP template; 28/29 (E4 N/A: DependencyInjection throws in Production without real auth configured -- a deliberate prod guard, not a crash). One genuine fail: E3 -- uses Trellis AddDevelopmentActorProvider(DefaultPermissions=All); a malformed X-Test-Actor resolves to default admin (201) = silent elevation. SAME E3 outcome as opus's from-scratch arm => E3 is MODEL-dependent, Trellis did not prevent it (X-Test-Actor parsing is app/dev-provider code). Product field named 'name' (not productName) -> probe alias fix. Most expensive run: in 38.1m / out 185.2k; 78 tests.",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 10,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 2,
+      "mediatr_handlers": 14,
+      "mediatr_dispatch": 5,
+      "authorize": 15,
+      "maybe": 20,
+      "result": 94,
+      "ef_conventions": 3
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 7
+    },
+    "cs_files": 81
+  }
 }

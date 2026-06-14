@@ -18,5 +18,32 @@
     "total": 20977600
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 29/29 = PERFECT (E4 N/A: prod-auth guard). FIRST memory-DISABLED with-trellis run. Fixed run-1's authz bugs: called AddDevelopmentActorProvider() with NO DefaultPermissions -> secure default actor (no perms) so malformed/absent X-Test-Actor is rejected (E3 PASS), and read-all is enforced (E5 PASS). The secure default (no absent->admin convenience) caused a FALSE 11/29 cascade until the probe was fixed to send an explicit admin actor (4th probe-fairness fix). sonnet-with INCONSISTENT: r1 26/29 (authz bugs, memory-on) vs r2 29/29 (perfect, memory-off) -- memory-off scored HIGHER, reconfirming the leak didn't inflate. Most expensive run: in 20.7m / out 277.6k / total 20.98M. Framework feedback captured in findings/model-feedback.md and is MEMORY-CLEAN: unlike run-1 (which quoted a stored memory verbatim), run-2 cites only the template's bundled .github/trellis-api-*.md docs -- no 'memory entry'/'your benchmark' references -- validating the /memory mitigation."
+  "notes": "Trellis ASP template; 29/29 = PERFECT (E4 N/A: prod-auth guard). FIRST memory-DISABLED with-trellis run. Fixed run-1's authz bugs: called AddDevelopmentActorProvider() with NO DefaultPermissions -> secure default actor (no perms) so malformed/absent X-Test-Actor is rejected (E3 PASS), and read-all is enforced (E5 PASS). The secure default (no absent->admin convenience) caused a FALSE 11/29 cascade until the probe was fixed to send an explicit admin actor (4th probe-fairness fix). sonnet-with INCONSISTENT: r1 26/29 (authz bugs, memory-on) vs r2 29/29 (perfect, memory-off) -- memory-off scored HIGHER, reconfirming the leak didn't inflate. Most expensive run: in 20.7m / out 277.6k / total 20.98M. Framework feedback captured in findings/model-feedback.md and is MEMORY-CLEAN: unlike run-1 (which quoted a stored memory verbatim), run-2 cites only the template's bundled .github/trellis-api-*.md docs -- no 'memory entry'/'your benchmark' references -- validating the /memory mitigation.",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 15,
+      "required_enum": 2,
+      "aggregates": 4,
+      "entities": 1,
+      "state_machine": 6,
+      "mediatr_handlers": 22,
+      "mediatr_dispatch": 84,
+      "authorize": 26,
+      "maybe": 39,
+      "result": 136,
+      "ef_conventions": 3
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 9
+    },
+    "cs_files": 126
+  }
 }

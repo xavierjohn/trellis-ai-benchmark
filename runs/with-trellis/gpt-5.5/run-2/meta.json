@@ -17,5 +17,32 @@
     "total": 6044400
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; 30/30 but LEFT the template Todo sample in place (Api/src/2026-03-26 & 2026-12-01 TodosController, Application/src/Todos, Acl/src/TodoRepository, Domain/tests/Todo*) alongside a correct OM impl at api 2026-11-12 -- incomplete 'replace the sample' cleanup; 82 .cs files vs run-1's 54; 13 tests"
+  "notes": "Trellis ASP template; 30/30 but LEFT the template Todo sample in place (Api/src/2026-03-26 & 2026-12-01 TodosController, Application/src/Todos, Acl/src/TodoRepository, Domain/tests/Todo*) alongside a correct OM impl at api 2026-11-12 -- incomplete 'replace the sample' cleanup; 82 .cs files vs run-1's 54; 13 tests",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 16,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediatr_handlers": 6,
+      "mediatr_dispatch": 27,
+      "authorize": 8,
+      "maybe": 42,
+      "result": 131,
+      "ef_conventions": 5
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 8
+    },
+    "cs_files": 82
+  }
 }

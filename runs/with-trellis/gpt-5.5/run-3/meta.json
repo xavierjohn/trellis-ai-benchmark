@@ -17,5 +17,32 @@
     "total": 6236500
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; clean (no Todo sample left; 38 .cs files); 13 tests"
+  "notes": "Trellis ASP template; clean (no Todo sample left; 38 .cs files); 13 tests",
+  "trellis_idiom_diagnostic": {
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
+    "uses": {
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediatr_pipeline": true
+    },
+    "idiom_counts": {
+      "value_objects": 12,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediatr_handlers": 14,
+      "mediatr_dispatch": 20,
+      "authorize": 16,
+      "maybe": 18,
+      "result": 97,
+      "ef_conventions": 2
+    },
+    "anti_idioms": {
+      "plain_enums": 0,
+      "throws": 0
+    },
+    "cs_files": 38
+  }
 }

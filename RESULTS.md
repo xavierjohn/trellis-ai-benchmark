@@ -126,6 +126,13 @@ Full treatment in [`METHODOLOGY.md`](METHODOLOGY.md); the load-bearing ones:
   as-int, the default actor) was about to fail a spec-correct service for the wrong reason — each
   verified against the actual source, each arm-agnostic, and a final full re-score confirmed all 18
   results come from one probe version.
+- **Adoption ≠ idiomatic use.** Because the rubric scores outcomes, not idioms, it can't tell whether
+  a with-Trellis run actually *used* the framework. A separate, **non-scored** diagnostic
+  ([`harness/idiom_check.py`](harness/idiom_check.py), in every with-Trellis `meta.json`) classifies
+  each run by its use of value objects, smart enums/state machine, and the MediatR pipeline. **9 of 10**
+  with-Trellis services are idiomatic; the one `template-only` run (`with-trellis/gpt-5.5/run-1` —
+  template scaffolded, then largely plain C#) is being **re-generated**, because it fails the
+  *condition*, not the *score*. The diagnostic is what made that auditable instead of invisible.
 - **n is small** (3 runs × 3 models × 2 arms). This is a credibility study, not a powered statistical
   claim. The artifacts are all here to re-score, re-run, or disagree.
 
