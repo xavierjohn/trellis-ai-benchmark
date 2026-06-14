@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "gpt-5.5",
   "run": 3,
-  "generated_at": "",
+  "generated_at": "2026-06-13T22:50:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "289a5eabdb6d268cf63116f14e0dc78c0f376437603a6fb518dcf62681f40eb4",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -10,12 +10,13 @@
   "trellis_packages": null,
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": null,
-    "input_cached": null,
-    "output": null,
-    "output_reasoning": null,
-    "total": null
+    "input": 4200000,
+    "input_cached": 4100000,
+    "input_cache_write": null,
+    "output": 45400,
+    "output_reasoning": 4500,
+    "total": 4245400
   },
   "generator": "manual clean-room",
-  "notes": ""
+  "notes": "from-scratch (2-project: single-file OrderManagementCore.cs + Program.cs minimal APIs + Tests). Generated under the NEW prompt (post 'no subagents / no parent folder') -> hash 289a5eab. 29/30. GENUINE, SERIOUS bug = E2: the OWNER-cancellation request deterministically HANGS and WEDGES THE SERVER (reproduced twice at the 30s read-timeout; every request after it also times out). The non-owner-reject (403) and admin-override (200) cancel paths return correctly -- only the path that proceeds through to the actual Cancel+SaveChanges for this actor hangs. Code (CancelOrderAsync/Order.Cancel/DbContext) shows no sync-over-async or lock; cause is most likely a SQLite write-lock/connection deadlock at a point in the write sequence (NOT root-caused to a line; described as observed behavior). This is exactly the class of subtle runtime reliability bug a quick test misses -- and gpt-5.5 is otherwise the strongest model (r1,r2 = 30/30 both arms; all three gpt WITH-trellis runs 30/30, no hang). TWO arm-agnostic harness robustness fixes were required and committed separately: (1) the E2 cancel block is isolated in try/except so a hang fails ONLY E2; (2) E2 (the wedge-prone owner-cancel) now runs LAST so the independent E1/E5/E3/E6 are assessed against a live server (order is irrelevant for a healthy service; E6 now uses random order ids). Before the fixes the hang falsely zeroed E3+E6 too (27/30); fair score is 29/30 (E2 only). Cheapest-but-one run: in 4.2m / out 45.4k / total 4.25M. No feedback collected this run."
 }

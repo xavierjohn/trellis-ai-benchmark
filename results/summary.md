@@ -1,13 +1,13 @@
 # Headline results
 
-_Generated 2026-06-14 05:50 UTC from 17 run(s)._
+_Generated 2026-06-14 06:08 UTC from 18 run(s)._
 
 Each cell is the **mean pass rate over the 30 neutral criteria**, averaged across runs.
 Higher is better. Δ is the with-Trellis advantage in percentage points.
 
 | Model | Without Trellis | With Trellis | Δ (pts) |
 |---|---|---|---|
-| gpt-5.5 | 100% | 100% | +0 |
+| gpt-5.5 | 99% | 100% | +1 |
 | opus-4.8 | 98% | 97% | -1 |
 | sonnet-4.6 | 94% | 95% | +1 |
 | **All models** | **97%** | **97%** | **+0** |
@@ -20,7 +20,7 @@ comparable signal across arms, since `input` is dominated by the identical paste
 
 | Model | Without: output | Without: total | With: output | With: total |
 |---|---|---|---|---|
-| gpt-5.5 | 19.3k | 1.22M | 36.8k | 5.94M |
+| gpt-5.5 | 28.0k | 2.23M | 36.8k | 5.94M |
 | opus-4.8 | 77.1k | 8.11M | 177.5k | 36.14M |
 | sonnet-4.6 | 59.4k | 5.16M | 184.1k | 16.92M |
 

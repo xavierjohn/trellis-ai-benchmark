@@ -497,24 +497,6 @@ class Probe:
         if r5b is not None:
             self._forbidden_statuses.add(r5b.status_code)
 
-        # --- E2 : cancel ownership ---
-        prod = self._make_product(price=5.0, stock=20, actor=admin)
-        alice = {"id": "alice", "permissions": ["orders:create", "orders:cancel", "orders:read"]}
-        bob = {"id": "bob", "permissions": ["orders:create", "orders:cancel", "orders:read"]}
-        o_alice = self._make_order(cust, prod, qty=1, actor=alice) if (cust and prod) else None
-        if o_alice:
-            r_bob = self.req("POST", f"/api/orders/{o_alice}/cancellation", actor=bob)      # non-owner
-            r_admin = self.req("POST", f"/api/orders/{o_alice}/cancellation", actor=admin)  # admin overrides
-            o2 = self._make_order(cust, prod, qty=1, actor=alice)
-            r_owner = self.req("POST", f"/api/orders/{o2}/cancellation", actor=alice) if o2 else None
-            ok2 = (r_bob.status_code == 403 and r_admin.status_code == 200
-                   and r_owner is not None and r_owner.status_code == 200)
-            self.record("E2", ok2,
-                        f"non-owner->{r_bob.status_code}; admin->{r_admin.status_code}; owner->{getattr(r_owner,'status_code',None)}")
-            self._forbidden_statuses.add(r_bob.status_code)
-        else:
-            self.record("E2", False, "setup failed (no order)")
-
         # --- E3 : malformed actor header must NOT silently elevate to admin ---
         for malformed in ('not-json-{{{', '{"id":"x"', '{"permissions":"orders:create"}'):
             rm = self.req("POST", "/api/customers", actor=malformed, json_body=self._customer())
@@ -525,11 +507,13 @@ class Probe:
             self.record("E3", True, "malformed actor header rejected on all variants (no silent elevation)")
 
         # --- E6 : empty-permission actor rejected on every privileged op ---
+        # Uses random (nonexistent) order ids on purpose: an empty-perm actor must be denied at
+        # authorization regardless of whether the target exists, so this never reaches order logic.
         empty = {"id": "nobody", "permissions": []}
         probes = [
             ("POST", "/api/customers", self._customer()),
-            ("POST", f"/api/orders/{o_alice or uuid.uuid4()}/submission", None),
-            ("POST", f"/api/orders/{o_alice or uuid.uuid4()}/cancellation", None),
+            ("POST", f"/api/orders/{uuid.uuid4()}/submission", None),
+            ("POST", f"/api/orders/{uuid.uuid4()}/cancellation", None),
             ("GET", "/api/orders/overdue", None),
         ]
         bad = []
@@ -539,6 +523,30 @@ class Probe:
                 if not (rr.status_code == 404):  # 404 from a missing id still means authz didn't pass-through to success
                     bad.append(f"{m} {p}->{rr.status_code}")
         self.record("E6", not bad, "all privileged ops denied for empty-perm actor" if not bad else f"unguarded: {bad}")
+
+        # --- E2 : cancel ownership --- (LAST: the owner-match cancel path can wedge a buggy service,
+        # so it runs after the independent E1/E5/E3/E6 checks have been assessed against a live server.)
+        prod = self._make_product(price=5.0, stock=20, actor=admin)
+        alice = {"id": "alice", "permissions": ["orders:create", "orders:cancel", "orders:read"]}
+        bob = {"id": "bob", "permissions": ["orders:create", "orders:cancel", "orders:read"]}
+        o_alice = self._make_order(cust, prod, qty=1, actor=alice) if (cust and prod) else None
+        if not o_alice:
+            self.record("E2", False, "setup failed (no order)")
+        else:
+            # Isolated so a hang/timeout on the owner-match cancel path (a genuine service bug)
+            # fails only E2 and does not abort the probe.
+            try:
+                r_bob = self.req("POST", f"/api/orders/{o_alice}/cancellation", actor=bob)      # non-owner
+                r_admin = self.req("POST", f"/api/orders/{o_alice}/cancellation", actor=admin)  # admin overrides
+                o2 = self._make_order(cust, prod, qty=1, actor=alice)
+                r_owner = self.req("POST", f"/api/orders/{o2}/cancellation", actor=alice) if o2 else None
+                ok2 = (r_bob.status_code == 403 and r_admin.status_code == 200
+                       and r_owner is not None and r_owner.status_code == 200)
+                self.record("E2", ok2,
+                            f"non-owner->{r_bob.status_code}; admin->{r_admin.status_code}; owner->{getattr(r_owner,'status_code',None)}")
+                self._forbidden_statuses.add(r_bob.status_code)
+            except requests.RequestException as e:
+                self.record("E2", False, f"cancel-ownership request failed/hung ({type(e).__name__}) — likely a hang in the owner-match cancel path")
 
     def check_D6_consistency(self):
         """The spec gives crisp codes to whole categories: not-found=404, conflict=409,
