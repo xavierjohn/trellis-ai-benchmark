@@ -3,7 +3,7 @@
   "model": "opus-4.8",
   "run": 1,
   "role": "contamination-control",
-  "generated_at": "",
+  "generated_at": "2026-06-14T00:13:00-07:00",
   "prompt": "prompts/paste/without-trellis.md",
   "prompt_sha256": "289a5eabdb6d268cf63116f14e0dc78c0f376437603a6fb518dcf62681f40eb4",
   "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
@@ -19,5 +19,5 @@
     "total": null
   },
   "generator": "manual clean-room",
-  "notes": "CONTAMINATION CONTROL (not in the headline 3-run aggregate; lives under validation/ which aggregate.py does not glob). Memory-DISABLED clean repeat of the without-trellis x opus-4.8 cell, whose headline runs r1-r3 were all generated memory-ON. Baseline arm: launch with --no-custom-instructions (blanket is safe -- no legitimate Trellis instructions exist) AND memory off. Purpose: confirm a fully clean generation reproduces the cell's contaminated headline score (29,29,30; E3 fails 2/3). WATCH E3: opus's malformed-X-Test-Actor -> admin elevation is model-intrinsic (catch -> Actor.DefaultAdmin()), not memory-driven, so it should persist clean -- evidence the E3 bug is the model's, not a contamination artifact. Generated on the current 422-spec (rubric-neutral)."
+  "notes": "CONTAMINATION CONTROL (not in the headline 3-run aggregate; lives under validation/ which aggregate.py does not glob). Memory-DISABLED clean repeat of the without-trellis x opus-4.8 cell (headline r1,r2,r3 all memory-ON: 29,29,30; E3 fails 2/3). Baseline arm: --no-custom-instructions (blanket safe) + memory off; new prompt -> hash 289a5eab. RESULT: 29/30, E3 FAIL (malformed X-Test-Actor 'not-json-{{{' -> 201 created, silent admin elevation). This EXACTLY matches the cell's contaminated behavior and -- crucially -- the E3 bug PERSISTS in the fully clean run, confirming E3 is MODEL-INTRINSIC (opus's catch->admin actor parsing), NOT a contamination artifact. Positive contamination-control signal in BOTH directions: the with-trellis gpt validation reproduced 30/30 (leak didn't inflate Trellis), and this baseline validation reproduced 29/30 with the same model bug (leak didn't fabricate the baseline's strength). The .slnx references projects (not the empty-stray kind). Generated on the 422-spec (rubric-neutral). Tokens pending from operator."
 }

@@ -20,14 +20,19 @@ aggregate never globs — leaves the headline as the **original, disclosed-conta
 After the 5 remaining headline runs are generated (all memory-clean), **4 of the 6** condition×model
 cells already contain ≥1 clean run. Only two cells are 100% contaminated with no clean run planned:
 
-| Cell | Headline runs (all memory-ON) | Contaminated score | What a clean repeat should show |
-|---|---|---|---|
-| `with-trellis / gpt-5.5` | r1, r2, r3 | 30/30 ×3 | ~30/30 — gpt passes E3 in both arms; should reproduce trivially |
-| `without-trellis / opus-4.8` | r1, r2, r3 | 29, 29, 30 (E3 fails 2/3) | ~29 — opus's malformed-actor→admin (E3) is **model-intrinsic**, not memory-driven, so it should persist clean |
+| Cell | Headline runs (all memory-ON) | Contaminated score | Predicted clean | **Clean result (actual)** |
+|---|---|---|---|---|
+| `with-trellis / gpt-5.5` | r1, r2, r3 | 30/30 ×3 | ~30/30 | **✅ 30/30 — reproduced exactly** (memory-clean feedback; no 422-vs-400 friction on 422-spec) |
+| `without-trellis / opus-4.8` | r1, r2, r3 | 29, 29, 30 (E3 fails 2/3) | ~29, E3 still fails | **✅ 29/30, E3 FAIL — reproduced** (the E3 privilege-escalation persists in the fully clean run → model-intrinsic, not contamination) |
 
-A reproduced score is positive evidence the leak did not move these cells. (We already have one such
-data point in the headline itself: `with-trellis/sonnet-4.6/run-2`, the first memory-off run, scored
-29/29 — *higher* than its contaminated sibling r1 at 26/29.)
+**Conclusion (both runs in):** the two contamination-control runs **reproduced their cells**, confirming
+the cross-session memory leak did not move them — in *both* directions: the with-Trellis run did not
+lose its 30/30 (the leak never inflated Trellis), and the baseline run kept its 29/30 **with the same
+E3 model bug** (the leak never fabricated the baseline's strength, and E3 is the model's defect, not an
+artifact). This complements the headline data point `with-trellis/sonnet-4.6/run-2` (the memory-off
+run that scored 29/29 — *higher* than its contaminated sibling r1 at 26/29). Across every memory-off
+data point, the with-Trellis arm is **unchanged-or-better**, so "Trellis is at parity-or-behind on the
+rubric" is robust to the contamination.
 
 ## How to generate, intake, and score
 
