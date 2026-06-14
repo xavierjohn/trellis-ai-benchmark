@@ -1,6 +1,6 @@
 # Per-criterion matrix
 
-_Generated 2026-06-14 06:42 UTC from 18 run(s)._
+_Generated 2026-06-14 07:30 UTC from 18 run(s)._
 
 Pass rate per criterion in each model × condition cell (averaged over runs).
 
@@ -21,7 +21,7 @@ Pass rate per criterion in each model × condition cell (averaged over runs).
 | `C5` Insufficient stock rejected (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `C6` Empty/out-of-range qty rejected (P) | 100% | 100% | 67% | 100% | 100% | 100% |
 | `C7` Duplicate product line rejected/combined (P) | 100% | 100% | 100% | 100% | 100% | 100% |
-| `C8` Order total correct (P) | 100% | 100% | 67% | 100% | 100% | 100% |
+| `C8` Order total correct (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `D1` Duplicate email -> 409 (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `D2` Duplicate SKU -> 409 (P) | 100% | 100% | 100% | 100% | 100% | 100% |
 | `D3` Not found -> 404 (P) | 100% | 100% | 100% | 100% | 100% | 100% |

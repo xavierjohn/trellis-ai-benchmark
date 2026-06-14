@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "gpt-5.5",
   "run": 3,
-  "evaluated_at": "2026-06-14T06:40:57.583421+00:00",
+  "evaluated_at": "2026-06-14T07:28:50.969583+00:00",
   "api_version": "2026-11-12",
   "score": {
     "passed": 29,
@@ -12,7 +12,7 @@
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "  Determining projects to restore...\n  All projects are up-to-date for restore.\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-3\\src\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-3\\tests\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.26"
+      "evidence": "  Determining projects to restore...\n  All projects are up-to-date for restore.\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-3\\src\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-3\\tests\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.51"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/40351afe-fc51-4902-9037-71ac5d5a4e13'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/7f36312c-8ed4-4ae3-bca6-f6a94ad1df3f'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/f608736d-c8aa-494e-86f3-61c94b6c8676'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/d064ee51-0912-4caa-9086-1c79be1bdec0'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/9df0bda1-7959-4160-9949-ffe370ac9c33'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/b35cdebb-ccf4-4229-9a38-4d53f6371741'"
     },
     "B4": {
       "pass": 1,

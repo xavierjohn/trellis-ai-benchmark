@@ -159,6 +159,31 @@ class Probe:
                         return v
         return []
 
+    @staticmethod
+    def _sum_line_items(body: Any) -> float | None:
+        """Derive the order total from line items (Σ unitPrice × quantity), used only as a C8
+        fallback when a service exposes correct line items (unit price captured at add time, per
+        spec §3.3) but no pre-summed aggregate total field. The computed total is then still
+        verifiable and correct; the missing aggregate field is recorded as an observation."""
+        total = 0.0
+        counted = 0
+        for it in Probe._line_items(body):
+            if not isinstance(it, dict):
+                continue
+            price = qty = None
+            for k, v in it.items():
+                if isinstance(v, bool) or not isinstance(v, (int, float)):
+                    continue
+                kl = k.lower()
+                if price is None and ("unitprice" in kl or kl == "price" or "unit_price" in kl):
+                    price = float(v)
+                elif qty is None and ("quantity" in kl or kl in ("qty", "count")):
+                    qty = float(v)
+            if price is not None and qty is not None:
+                total += price * qty
+                counted += 1
+        return total if counted else None
+
     # Spec §2 canonical order-status order; used to decode an int/numeric enum status
     # (a service may serialize OrderStatus as its integer value rather than its name).
     CANONICAL_STATUS = ("draft", "submitted", "approved", "shipped", "delivered", "cancelled")
@@ -323,8 +348,12 @@ class Probe:
             self.record("B4", rget.status_code == 200 and body is not None,
                         f"GET /api/orders/{{id}} -> {rget.status_code}")
             total = self._find_num(body, ("total", "amount"))
+            derived = ""
+            if total is None:
+                total = self._sum_line_items(body)
+                derived = " [derived from line items; no aggregate total field exposed]"
             self.record("C8", total is not None and abs(total - 20.0) < 0.01,
-                        f"order total={total} (expected 20.0 = 10.00 x 2)")
+                        f"order total={total} (expected 20.0 = 10.00 x 2){derived}")
             # add the SAME product again -> must be rejected or combined (never 2 rows)
             radd = self.req("POST", f"/api/orders/{order}/line-items",
                             json_body={"productId": prod, "quantity": 1})

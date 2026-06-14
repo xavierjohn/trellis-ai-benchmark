@@ -71,7 +71,7 @@ Criteria are grouped so subtotals are meaningful on their own:
 | C5 | Submitting with insufficient stock is rejected (`400`/`422`). | P | §4, §6.7 |
 | C6 | An order cannot be created/submitted with zero line items; quantity outside 1–999 is rejected. | P | §3.3, §6.4 |
 | C7 | Adding the same product twice to one order is rejected or combined (never two line-item rows for one product). | P | §3.3 |
-| C8 | Order total equals Σ(unit price × quantity) over line items, using the price captured at add time. | P | §3.3 |
+| C8 | Order total equals Σ(unit price × quantity) over line items, using the price captured at add time. (A service that exposes correct line items but no pre-summed aggregate-total field passes on the derived total; see fairness notes.) | P | §3.3 |
 
 ## D. Error contract
 
@@ -120,3 +120,10 @@ Criteria are grouped so subtotals are meaningful on their own:
   that run (excluded from the denominator), never a free pass or an unearned fail.
 - A criterion that cannot be evaluated because the service failed to start (A2 fails) is
   scored `0` for that run — a service that doesn't run meets no behavioral criteria.
+- **C8 accepts a *derived* order total.** The criterion verifies the total *equals*
+  Σ(unit price × quantity) at the price captured when each line was added. A service that
+  returns correct line items (unit price + quantity) but does not pre-sum an aggregate `total`
+  field still **passes**, because the value is present and verifiable; the probe sums the line
+  items when no aggregate field is exposed. The missing aggregate-total field is recorded as an
+  observation, not a scored failure. This is the credibility-conservative reading — it can only
+  *strengthen* an implementation, never manufacture an advantage for one approach over another.

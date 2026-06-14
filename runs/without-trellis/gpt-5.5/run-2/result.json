@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "gpt-5.5",
   "run": 2,
-  "evaluated_at": "2026-06-14T06:40:20.729932+00:00",
+  "evaluated_at": "2026-06-14T07:28:12.615541+00:00",
   "api_version": "2026-11-12",
   "score": {
     "passed": 30,
@@ -12,7 +12,7 @@
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": ".Api.csproj (in 108 ms).\n  Restored C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-2\\OrderManagement.Tests\\OrderManagement.Tests.csproj (in 109 ms).\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-2\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-2\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.34"
+      "evidence": "  Determining projects to restore...\n  All projects are up-to-date for restore.\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-2\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\gpt-5.5\\run-2\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.28"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/2809a1de-aa8d-4c3b-aece-86712b4d3561'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/2e085e7d-4d79-41b6-aceb-50375720d599'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/109a54c7-840f-4068-a8f8-d0e915e01625'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/5ab70485-1cb4-4a2a-b06a-8766bccd1cf1'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/2fd5af89-afc8-41cd-9301-d23e9a12bc9a'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/6f628aca-243b-4135-9a9f-330b26e750e5'"
     },
     "B4": {
       "pass": 1,

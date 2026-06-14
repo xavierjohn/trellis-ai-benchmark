@@ -2,7 +2,7 @@
   "condition": "without-trellis",
   "model": "opus-4.8",
   "run": 3,
-  "evaluated_at": "2026-06-14T06:41:27.013559+00:00",
+  "evaluated_at": "2026-06-14T07:29:20.825918+00:00",
   "api_version": "2026-11-12",
   "score": {
     "passed": 30,
@@ -12,7 +12,7 @@
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\src\\OrderManagement.Infrastructure\\bin\\Release\\net10.0\\OrderManagement.Infrastructure.dll\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\src\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\tests\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.82"
+      "evidence": "github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\src\\OrderManagement.Infrastructure\\bin\\Release\\net10.0\\OrderManagement.Infrastructure.dll\n  OrderManagement.Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\src\\OrderManagement.Api\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  OrderManagement.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\without-trellis\\opus-4.8\\run-3\\tests\\OrderManagement.Tests\\bin\\Release\\net10.0\\OrderManagement.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:01.65"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/5c9c744f-4a36-4cc1-804f-3e4c399962f8'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/92bd5c6b-db3b-4450-8294-062abd486e10'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/43bd2af2-7b21-4f2d-83f0-67db7e3e2df9'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/7480c553-5200-498b-b186-c2e6ef62e80c'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/d3844ce3-0b79-4555-823d-4f79af0450bd'"
+      "evidence": "POST /api/orders -> 201, Location='/api/orders/2c519d57-3e5a-4d9a-874f-061099fb4f07'"
     },
     "B4": {
       "pass": 1,
