@@ -337,7 +337,8 @@ quantitative artifact by the model's own qualitative account.
 > the binder ignores `MapError` (the word "hardcode" does not appear; the copilot-instructions.md
 > "memory" hits are unrelated If-Match lines). Likely mechanism: memory was **ON at session start**
 > (already injected into context) and a **mid-session `/memory` disable does not purge already-loaded
-> memories** — so disable memory *before* starting the session. Direction is **inflating** (with-Trellis
+> memories** — so disable memory *before* starting the session (**confirmed:** the operator attests
+> they toggled `/memory` off inside the already-running session, then pasted). Direction is **inflating** (with-Trellis
 > insider knowledge), yet run 3 scored **28/29 — lower than the clean run 2 (29/29)** and failed **E3**
 > (insecure dev-actor-provider default this run), reconfirming the leak does **not** inflate the rubric
 > outcome. So sonnet-with has **one clean run (r2, 29/29)** and **two contaminated runs (r1 26/29, r3
