@@ -21,7 +21,7 @@ Mean pass rate over the 30 framework-neutral criteria (3 runs per cell, 18 servi
 
 | Model | Without Trellis | With Trellis | Δ (pts) |
 |---|---|---|---|
-| gpt-5.5 | 99% | 100% | +1 |
+| gpt-5.5 | 99% | 99% | −0 |
 | opus-4.8 | 98% | 97% | −1 |
 | sonnet-4.6 | 96% | 95% | −0 |
 | **All models** | **97%** | **97%** | **±0** |

@@ -1,18 +1,16 @@
-### Health
-GET {{host}}/health
-
 ### Create customer
 # @name createCustomer
 POST {{host}}/api/customers?api-version={{apiVersion}}
 Content-Type: application/json
-X-Test-Actor: {{salesActor}}
+X-Test-Actor: {{adminActor}}
 
 {
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "email": "jane-{{$guid}}@example.com",
+  "firstName": "Ada",
+  "lastName": "Lovelace",
+  "email": "ada@example.com",
+  "phoneNumber": "+14155551234",
   "shippingAddress": {
-    "street": "1 Main",
+    "street": "1 Main St",
     "city": "Seattle",
     "state": "WA",
     "postalCode": "98101",
@@ -24,18 +22,18 @@ X-Test-Actor: {{salesActor}}
 # @name createProduct
 POST {{host}}/api/products?api-version={{apiVersion}}
 Content-Type: application/json
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 {
   "productName": "Widget",
-  "sku": "SKU{{$randomInt 100000 999999}}",
+  "sku": "WIDGET1",
   "unitPrice": 12.50
 }
 
 ### Add stock
 POST {{host}}/api/products/{{createProduct.response.body.id}}/stock-additions?api-version={{apiVersion}}
 Content-Type: application/json
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 {
   "quantity": 25
@@ -57,7 +55,12 @@ X-Test-Actor: {{salesActor}}
   ]
 }
 
-### Add line item to draft order
+### Get order
+GET {{host}}/api/orders/{{createOrder.response.body.id}}?api-version={{apiVersion}}
+Accept: application/json
+X-Test-Actor: {{salesActor}}
+
+### Add line item
 POST {{host}}/api/orders/{{createOrder.response.body.id}}/line-items?api-version={{apiVersion}}
 Content-Type: application/json
 X-Test-Actor: {{salesActor}}
@@ -67,7 +70,7 @@ X-Test-Actor: {{salesActor}}
   "quantity": 1
 }
 
-### Remove line item from draft order
+### Remove line item
 DELETE {{host}}/api/orders/{{createOrder.response.body.id}}/line-items/{{createOrder.response.body.lineItems[0].id}}?api-version={{apiVersion}}
 X-Test-Actor: {{salesActor}}
 
@@ -77,31 +80,29 @@ X-Test-Actor: {{salesActor}}
 
 ### Approve order
 POST {{host}}/api/orders/{{createOrder.response.body.id}}/approval?api-version={{apiVersion}}
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 ### Ship order
 POST {{host}}/api/orders/{{createOrder.response.body.id}}/shipment?api-version={{apiVersion}}
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 ### Deliver order
 POST {{host}}/api/orders/{{createOrder.response.body.id}}/delivery?api-version={{apiVersion}}
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 ### Cancel order
 POST {{host}}/api/orders/{{createOrder.response.body.id}}/cancellation?api-version={{apiVersion}}
-X-Test-Actor: {{salesActor}}
+X-Test-Actor: {{adminActor}}
 
-### Get order
-GET {{host}}/api/orders/{{createOrder.response.body.id}}?api-version={{apiVersion}}
-Accept: application/json
-X-Test-Actor: {{salesActor}}
-
-### List customer orders
+### List orders by customer
 GET {{host}}/api/customers/{{createCustomer.response.body.id}}/orders?api-version={{apiVersion}}
 Accept: application/json
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
 
 ### List overdue orders
 GET {{host}}/api/orders/overdue?api-version={{apiVersion}}
 Accept: application/json
-X-Test-Actor: {{warehouseActor}}
+X-Test-Actor: {{adminActor}}
+
+### Health
+GET {{host}}/health

@@ -10,7 +10,9 @@ using OpenTelemetry.Logs;
 using Scalar.AspNetCore;
 using Trellis.ServiceLevelIndicators;
 using Trellis.Asp;
+using Trellis.Asp.Authorization;
 using Trellis.Asp.Idempotency;
+using OrderManagement.Domain;
 
 internal static class DependencyInjection
 {
@@ -54,6 +56,9 @@ internal static class DependencyInjection
         });
         services.AddControllers();
         services.AddTrellisAspWithScalarValidation();
+        services.AddResourceCollectionName<Customer>("customers");
+        services.AddResourceCollectionName<Product>("products");
+        services.AddResourceCollectionName<Order>("orders");
         services.AddTrellisIdempotency();
         services.AddInMemoryIdempotencyStore();
         services.AddApiVersioning()
@@ -61,6 +66,17 @@ internal static class DependencyInjection
                 .AddApiExplorer()
                 .AddOpenApi(options => options.Document.AddScalarTransformers());
         services.AddHealthChecks();
+
+        if (environment.IsDevelopment())
+            services.AddDevelopmentActorProvider(options =>
+            {
+                options.DefaultActorId = "admin";
+                options.DefaultPermissions = Permissions.All.ToHashSet(StringComparer.Ordinal);
+            });
+        else
+            throw new InvalidOperationException(
+                "Production IActorProvider not configured. " +
+                "Register AddEntraActorProvider() with your Azure Entra ID configuration for non-development environments.");
 
         return services;
     }

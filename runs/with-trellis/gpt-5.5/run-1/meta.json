@@ -2,47 +2,48 @@
   "condition": "with-trellis",
   "model": "gpt-5.5",
   "run": 1,
-  "generated_at": "2026-06-12T17:55:00-07:00",
+  "generated_at": "2026-06-14T01:20:00-07:00",
   "prompt": "prompts/paste/with-trellis.md",
-  "prompt_sha256": "bc031b42d786c4f38c5a50d795d0024493f254a9350f10d8e0b342ba7b93249f",
-  "spec_sha256": "57d8761562aeeeee74db792528cd345c358600ce3a7289ee8d9c321a05ad3175",
+  "prompt_sha256": "a3ff1e0e29f8b4f67f5015c57a83f847af54295526bb18e1f5929a2d5874ac60",
+  "spec_sha256": "40d14c22ea72a0804b6576036254bc424f56669a21a33069fdf85c7c80ffa23f",
   "template": "Trellis.AspTemplate 1.0.21-alpha",
   "trellis_packages": "3.0.0-alpha.382",
   "dotnet_sdk": "10.0.301",
   "tokens": {
-    "input": 5500000,
-    "input_cached": 5300000,
-    "output": 29600,
-    "output_reasoning": 3800,
-    "total": 5529600
+    "input": 9300000,
+    "input_cached": 9200000,
+    "input_cache_write": null,
+    "output": 41600,
+    "output_reasoning": 6700,
+    "total": 9341600
   },
   "generator": "manual clean-room",
-  "notes": "Trellis ASP template; layered Domain/Application/Api/Acl; 40 tests across 4 test projects",
+  "notes": "RE-GENERATED 2026-06-14 (memory-off, NEW prompt a3ff1e0e, 422-spec). REPLACES the original run-1 (generated 2026-06-12, memory-ON, 400-spec prompt bc031b42, scored 30/30) which was TEMPLATE-ONLY: it scaffolded the Trellis template but wrote largely plain C# (plain enum, raw primitives, no value objects / aggregates / state machine / Mediator; controllers hit DbContext directly). The non-scored idiom diagnostic (harness/idiom_check.py) flagged it as not satisfying the 'build WITH the framework' CONDITION (a validity issue, independent of its score) -> re-generated. THIS run is genuinely idiomatic (value_objects=16, RequiredEnum, aggregates=3, LazyStateMachine, Mediator handlers=14, Maybe=26, Result=82; verdict=idiomatic). SCORE: 28/29 -- E3 FAIL (malformed X-Test-Actor 'not-json-{{{' -> 201 created, silent admin elevation via AddDevelopmentActorProvider's default-admin) + E4 N/A (Trellis prod-auth guard blocks Production boot). HONEST TWIST worth highlighting: building IDIOMATICALLY with Trellis scored LOWER (28/29 ~ 96.6%) than the template-only plain-C# version (30/30) -- using the dev-actor-provider idiomatically introduced the very E3 footgun seen across opus-with and sonnet-with, and the prod-auth guard makes E4 N/A. This STRENGTHENS the parity finding: even the corrected, genuinely-Trellis gpt run does not beat baseline on the rubric. NB: uses Mediator (the source-generated package), NOT MediatR. Tokens in 9.3m (9.2m cached) / out 41.6k / total 9.34M. Framework feedback pending.",
   "trellis_idiom_diagnostic": {
-    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
-    "verdict": "template-only",
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, the Mediator command pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "verdict": "idiomatic",
     "uses": {
-      "value_objects": false,
-      "smart_enum_or_state_machine": false,
-      "mediatr_pipeline": false
+      "value_objects": true,
+      "smart_enum_or_state_machine": true,
+      "mediator_pipeline": true
     },
     "idiom_counts": {
-      "value_objects": 0,
-      "required_enum": 0,
-      "aggregates": 0,
-      "entities": 0,
-      "state_machine": 0,
-      "mediatr_handlers": 0,
-      "mediatr_dispatch": 0,
-      "authorize": 0,
-      "maybe": 0,
-      "result": 73,
-      "ef_conventions": 3
+      "value_objects": 16,
+      "required_enum": 1,
+      "aggregates": 3,
+      "entities": 1,
+      "state_machine": 3,
+      "mediator_handlers": 14,
+      "mediator_dispatch": 3,
+      "authorize": 14,
+      "maybe": 26,
+      "result": 82,
+      "ef_conventions": 4
     },
     "anti_idioms": {
-      "plain_enums": 1,
-      "throws": 5
+      "plain_enums": 0,
+      "throws": 7
     },
-    "cs_files": 32
+    "cs_files": 51
   }
 }

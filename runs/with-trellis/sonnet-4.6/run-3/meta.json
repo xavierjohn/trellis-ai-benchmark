@@ -20,12 +20,12 @@
   "generator": "manual clean-room",
   "notes": "Trellis ASP template; 28/29 (E4 N/A: prod-auth guard). E3 FAIL: malformed X-Test-Actor 'not-json-{{{' -> created customer 201 (silent admin elevation); this run chose the INSECURE dev-actor-provider default, unlike r2's secure AddDevelopmentActorProvider(). So E3 varies run-to-run WITHIN sonnet+with (r2 PASS vs r3 FAIL) -- more evidence E3 is config/run-dependent, NOT Trellis-fixed. CONTAMINATION (feedback NOT clean despite memory-off intent): the model wrote 'ScalarValueValidationMiddleware hardcodes 422 and ignores MapError overrides -- a trap documented in memory.' That specific 'ignores MapError' insight is NOT derivable from the bundled template docs (verified: trellis-api-asp.md documents MapError as a working override and ScalarValueValidationMiddleware separately, never that the binder ignores MapError; 'hardcode' absent; copilot-instructions.md 'memory' hits are unrelated If-Match lines) and it matches the benchmark's stored Copilot memory near-verbatim. Likely cause: memory was ON at session start (loaded into context) and the mid-session /memory disable did NOT purge already-injected memories -> disable memory BEFORE starting the session. CONFIRMED by operator (attests they toggled /memory off mid-session, in the same running session, then pasted). So r3 is contaminated like r1 (inflating direction); yet it scored 28/29 < clean r2's 29/29, reconfirming the leak does not inflate the rubric outcome. Tokens in 17.4m / out 163.9k / total 17.56M.",
   "trellis_idiom_diagnostic": {
-    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, the Mediator command pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
     "verdict": "idiomatic",
     "uses": {
       "value_objects": true,
       "smart_enum_or_state_machine": true,
-      "mediatr_pipeline": true
+      "mediator_pipeline": true
     },
     "idiom_counts": {
       "value_objects": 11,
@@ -33,8 +33,8 @@
       "aggregates": 3,
       "entities": 1,
       "state_machine": 3,
-      "mediatr_handlers": 14,
-      "mediatr_dispatch": 35,
+      "mediator_handlers": 14,
+      "mediator_dispatch": 35,
       "authorize": 15,
       "maybe": 16,
       "result": 106,

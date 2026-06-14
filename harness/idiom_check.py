@@ -28,8 +28,8 @@ IDIOM = {
     "aggregates": re.compile(r":\s*Aggregate\s*<"),
     "entities": re.compile(r":\s*Entity\s*<"),
     "state_machine": re.compile(r"\bLazyStateMachine\s*<"),
-    "mediatr_handlers": re.compile(r"\bI(?:Command|Query|Request)Handler\s*<"),
-    "mediatr_dispatch": re.compile(r"\b_sender\.Send\b|\bISender\b|\bIMediator\b"),
+    "mediator_handlers": re.compile(r"\bI(?:Command|Query|Request)Handler\s*<"),
+    "mediator_dispatch": re.compile(r"\b_sender\.Send\b|\bISender\b|\bIMediator\b"),
     "authorize": re.compile(r"\bIAuthorize\b|\bIAuthorizeResource\s*<"),
     "maybe": re.compile(r"\bMaybe\s*<"),
     "result": re.compile(r"\bResult\s*<|\bResult\.(?:Ok|Fail|Success|Failure|Combine|Ensure)\b"),
@@ -62,11 +62,11 @@ def analyze(run_dir: Path) -> dict:
             anti[k] += len(rx.findall(text))
 
     # Classification on the framework's load-bearing surfaces: value objects, smart enums / state
-    # machine, and the MediatR/CQRS pipeline. Result<T> alone (which even a near-plain service uses
-    # for validation) is NOT sufficient to count as idiomatic.
+    # machine, and the Mediator (source-generated; NOT MediatR) command pipeline. Result<T> alone
+    # (which even a near-plain service uses for validation) is NOT sufficient to count as idiomatic.
     uses_value_objects = counts["value_objects"] > 0
     uses_smart_state = counts["required_enum"] > 0 or counts["state_machine"] > 0
-    uses_pipeline = counts["mediatr_handlers"] > 0
+    uses_pipeline = counts["mediator_handlers"] > 0
     core = sum([uses_value_objects, uses_smart_state, uses_pipeline])
     if core == 3:
         verdict = "idiomatic"
@@ -77,13 +77,13 @@ def analyze(run_dir: Path) -> dict:
 
     return {
         "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework "
-                "(value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template "
-                "and write plain C#? Never affects the neutral rubric score.",
+                "(value objects, smart enums/state machine, the Mediator command pipeline) vs. scaffold "
+                "the template and write plain C#? Never affects the neutral rubric score.",
         "verdict": verdict,
         "uses": {
             "value_objects": uses_value_objects,
             "smart_enum_or_state_machine": uses_smart_state,
-            "mediatr_pipeline": uses_pipeline,
+            "mediator_pipeline": uses_pipeline,
         },
         "idiom_counts": counts,
         "anti_idioms": anti,
@@ -99,7 +99,7 @@ def _write_meta(run_dir: Path) -> str:
     meta["trellis_idiom_diagnostic"] = analyze(run_dir)
     meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     d = meta["trellis_idiom_diagnostic"]
-    return f"{run_dir.relative_to(REPO)}: {d['verdict']:13} (VO={d['uses']['value_objects']}, smart={d['uses']['smart_enum_or_state_machine']}, pipeline={d['uses']['mediatr_pipeline']})"
+    return f"{run_dir.relative_to(REPO)}: {d['verdict']:13} (VO={d['uses']['value_objects']}, smart={d['uses']['smart_enum_or_state_machine']}, pipeline={d['uses']['mediator_pipeline']})"
 
 
 def main():

@@ -19,13 +19,13 @@ Mean pass rate over the 30 framework-neutral criteria (3 runs per cell, 18 servi
 
 | Model | Without Trellis | With Trellis | Δ (pts) |
 |---|---|---|---|
-| gpt-5.5 | 99% | 100% | **+1** |
+| gpt-5.5 | 99% | 99% | **−0** |
 | opus-4.8 | 98% | 97% | **−1** |
 | sonnet-4.6 | 96% | 95% | **−0** |
 | **All models** | **97%** | **97%** | **±0** |
 
-Two of three models land fractionally *ahead* with Trellis, one fractionally behind; the aggregate is
-a tie. **No honest reading of the outcome rubric shows Trellis meaningfully ahead or behind.** That is
+With Trellis, every model lands **tie-or-fractionally-behind** — none ahead — and the aggregate is a
+tie. **No honest reading of the outcome rubric shows Trellis meaningfully ahead or behind.** That is
 the intended, credible result — and the reason the rubric is scored on outcomes only (a rubric that
 rewarded "uses `Result<T>`" would measure adherence to Trellis, not quality).
 
@@ -38,15 +38,22 @@ suites are correct essentially everywhere, in both arms. The entire signal lives
 
 | Criterion | Where it drops | Cause | Framework-preventable? |
 |---|---|---|---|
-| **E3** — malformed `X-Test-Actor` must not elevate to admin | w/o opus 33%, w/o sonnet 0%, **w/ opus 0%, w/ sonnet 33%**, gpt 100% both arms | The §5.5 test-actor header is parsed by **application / dev-provider** code; several models default a malformed header to an admin actor (a real privilege-escalation). | **No.** It fails *on Trellis too* — the parsing seam is app code, not a framework guardrail. **Model-dependent** (gpt passes everywhere; opus fails everywhere). |
+| **E3** — malformed `X-Test-Actor` must not elevate to admin | w/o opus 33%, w/o sonnet 0%, **w/ gpt 67%, w/ opus 0%, w/ sonnet 33%**, w/o gpt 100% | The §5.5 test-actor header is parsed by **application / dev-provider** code; several models default a malformed header to an admin actor (a real privilege-escalation). On Trellis the usual cause is wiring `AddDevelopmentActorProvider` with a default-admin actor. | **No.** It fails *on Trellis too* — the parsing seam is app / dev-provider code, not a framework guardrail. **Model-dependent**, and (tellingly) gpt only started failing it once it built **idiomatically** with Trellis (see below). |
 | **E4** — no internal leak in Production | N/A for w/ opus, w/ sonnet | Their Trellis services refuse to boot in Production without real auth wired (a deliberate framework guard), so the no-leak check can't run and is excluded from the denominator. | This is Trellis being *stricter*, not a failure. |
 | **C6** — empty/out-of-range line items rejected at create | w/o sonnet 67% | One sonnet baseline run (`without/sonnet/r3`) creates an **empty draft order** and only adds items via a separate endpoint, so create-time line-item validation is absent. | A spec-deviation in one from-scratch run. |
 | **E2** — cancel ownership enforced | w/o gpt 67% | One gpt baseline run (`without/gpt/r3`) **deterministically hangs** on owner self-cancellation and wedges the server (an effective DoS). | A genuine runtime reliability bug — see §3. |
 | **D6 / E5** — consistent status mapping / read-all enforced | w/ sonnet 67% each | One sonnet *Trellis* run (`with/sonnet/r1`) left read-all endpoints unprotected (empty `RequiredPermissions`) and mapped a status inconsistently. | A real authz bug — Trellis did **not** prevent it here (the permission list was simply left empty). |
 
-The dominant differentiator is **E3**, and it is **model-intrinsic, not framework-determined**: it
-fails in *both* arms for the models prone to it. Trellis narrows the space of mistakes; it does not
-eliminate them where the mistake lives in application code.
+The dominant differentiator is **E3**, and it lives in **application / dev-provider code, not a
+framework guardrail** — so it fails *on Trellis too*. The sharpest illustration came from re-checking
+idiom usage (see §6): the original `with-trellis/gpt-5.5/run-1` had scaffolded the template but written
+largely *plain C#* (manual, secure actor parsing) and scored a clean **30/30**. Re-generated to build
+**idiomatically** with Trellis, the *same model on the same task* scored **28/29** — it now **fails
+E3** (the idiomatic `AddDevelopmentActorProvider` defaults a malformed actor to admin) and **E4 becomes
+N/A** (the framework's production-auth guard refuses to boot without real auth). In other words,
+adopting Trellis *idiomatically* here **cost** gpt rubric points rather than winning them. That is a
+striking, honest data point: it both reinforces the parity headline and shows the value (the prod-auth
+guard, the explicit dev-actor seam) is about *structure and strictness*, not a higher score.
 
 ## 3. What the rubric can't see — and why it matters
 
@@ -100,11 +107,11 @@ spec.
 
 | Model | Without: output | With: output | With ÷ Without (output) | Without: total | With: total |
 |---|---|---|---|---|---|
-| gpt-5.5 | 28.0k | 36.8k | 1.3× | 2.23M | 5.94M |
+| gpt-5.5 | 28.0k | 40.8k | 1.5× | 2.23M | 7.21M |
 | opus-4.8 | 77.1k | 177.5k | 2.3× | 8.11M | 36.14M |
 | sonnet-4.6 | 59.4k | 184.1k | 3.1× | 5.16M | 16.92M |
 
-Building **on Trellis costs ~1.3–3.1× the output tokens** (and 2.7–4.5× total), because the model must
+Building **on Trellis costs ~1.5–3.1× the output tokens** (and ~3.2–4.5× total), because the model must
 read the bundled API references, follow the layered structure, and satisfy the analyzers. This is the
 real, measured trade-off: **more generation cost now, in exchange for a narrower path to latent bugs
 later.** Whether that trade is worth it depends on how well-tested and how long-lived the code is.
@@ -129,10 +136,13 @@ Full treatment in [`METHODOLOGY.md`](METHODOLOGY.md); the load-bearing ones:
 - **Adoption ≠ idiomatic use.** Because the rubric scores outcomes, not idioms, it can't tell whether
   a with-Trellis run actually *used* the framework. A separate, **non-scored** diagnostic
   ([`harness/idiom_check.py`](harness/idiom_check.py), in every with-Trellis `meta.json`) classifies
-  each run by its use of value objects, smart enums/state machine, and the MediatR pipeline. **9 of 10**
-  with-Trellis services are idiomatic; the one `template-only` run (`with-trellis/gpt-5.5/run-1` —
-  template scaffolded, then largely plain C#) is being **re-generated**, because it fails the
-  *condition*, not the *score*. The diagnostic is what made that auditable instead of invisible.
+  each run by its use of value objects, smart enums/state machine, and the Mediator command pipeline
+  (the source-generated package Trellis uses, *not* MediatR). It flagged the original
+  `with-trellis/gpt-5.5/run-1` as `template-only` (template scaffolded, then largely plain C#); that
+  run was **re-generated** into a genuinely idiomatic Trellis build, so **all 10** with-Trellis services
+  are now idiomatic. The rebuild scored **28/29** — *lower* than the plain-C# original's 30/30 (see §2)
+  — which reinforces the parity finding. It failed the *condition*, not the *score*; the diagnostic is
+  what made that auditable instead of invisible.
 - **n is small** (3 runs × 3 models × 2 arms). This is a credibility study, not a powered statistical
   claim. The artifacts are all here to re-score, re-run, or disagree.
 

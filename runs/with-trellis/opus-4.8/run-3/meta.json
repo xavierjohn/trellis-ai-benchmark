@@ -20,12 +20,12 @@
   "generator": "manual clean-room",
   "notes": "Trellis ASP template; 28/29 (E4 N/A: prod-auth guard prevents Production boot). E3 FAIL: malformed X-Test-Actor 'not-json-{{{' -> created customer 201 (silent admin elevation) -- the opus-INTRINSIC E3 bug, identical to opus-with r1 & r2 and opus baseline (opus fails E3 in BOTH arms). So opus-with is PERFECTLY CONSISTENT: r1 28/29, r2 28/29, r3 28/29. PROMPT PROVENANCE: this generation was already in progress (its OrderManagement/ scaffold folder was present in the slot) BEFORE the prompt was updated with the 'no subagents / no parent folder' rules, so it used the OLD with-trellis paste prompt -> keeps the OLD hash 53dd9b00 (NOT the new a3ff1e0e; the rehash script had bumped it while it lacked a result.json). Slot artifacts cleaned at intake: empty nested OrderManagement/ dir (aborted scaffold) + run.log (operator's local EF run log) -- neither is generated source. Most expensive run in the benchmark: in 35.3m (34.1m cached) / out 163.1k / total 35.46M. Framework feedback CAPTURED in findings/model-feedback.md and MEMORY-CLEAN (cites only Trellis API surface + bundled trellis-api-*.md/cookbook; no 'memory entry'/'your benchmark' tell). Notably this run (on the 422-spec) reports getting '422/404/409/403 almost for free' and does NOT cite the 422-vs-400 friction -- evidence that friction is spec-dependent (bites only on a 400-spec; the revised 422-spec aligns with Trellis's default).",
   "trellis_idiom_diagnostic": {
-    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, MediatR pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
+    "note": "NON-SCORED advisory. Does the with-trellis service actually build WITH the framework (value objects, smart enums/state machine, the Mediator command pipeline) vs. scaffold the template and write plain C#? Never affects the neutral rubric score.",
     "verdict": "idiomatic",
     "uses": {
       "value_objects": true,
       "smart_enum_or_state_machine": true,
-      "mediatr_pipeline": true
+      "mediator_pipeline": true
     },
     "idiom_counts": {
       "value_objects": 11,
@@ -33,8 +33,8 @@
       "aggregates": 3,
       "entities": 1,
       "state_machine": 3,
-      "mediatr_handlers": 14,
-      "mediatr_dispatch": 28,
+      "mediator_handlers": 14,
+      "mediator_dispatch": 28,
       "authorize": 16,
       "maybe": 21,
       "result": 93,

@@ -1,18 +1,18 @@
 {
   "condition": "with-trellis",
   "model": "gpt-5.5",
-  "run": 1,
-  "evaluated_at": "2026-06-14T07:25:05.818958+00:00",
+  "run": "run-1",
+  "evaluated_at": "2026-06-14T08:24:55.841535+00:00",
   "api_version": "2026-11-12",
   "score": {
-    "passed": 30,
-    "total": 30,
-    "rate": 1.0
+    "passed": 28,
+    "total": 29,
+    "rate": 0.966
   },
   "criteria": {
     "A1": {
       "pass": 1,
-      "evidence": "trellis\\gpt-5.5\\run-1\\Application\\tests\\bin\\Release\\net10.0\\Application.Tests.dll\n  AntiCorruptionLayer.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Acl\\tests\\bin\\Release\\net10.0\\AntiCorruptionLayer.Tests.dll\n  Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Api\\src\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  Api.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Api\\tests\\bin\\Release\\net10.0\\Api.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:03.01"
+      "evidence": "trellis\\gpt-5.5\\run-1\\Application\\tests\\bin\\Release\\net10.0\\Application.Tests.dll\n  AntiCorruptionLayer.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Acl\\tests\\bin\\Release\\net10.0\\AntiCorruptionLayer.Tests.dll\n  Api -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Api\\src\\bin\\Release\\net10.0\\OrderManagement.Api.dll\n  Api.Tests -> C:\\github\\xavier\\Trellis\\trellis-ai-benchmark\\runs\\with-trellis\\gpt-5.5\\run-1\\Api\\tests\\bin\\Release\\net10.0\\Api.Tests.dll\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\nTime Elapsed 00:00:02.70"
     },
     "A2": {
       "pass": 1,
@@ -20,15 +20,15 @@
     },
     "B1": {
       "pass": 1,
-      "evidence": "POST /api/customers -> 201, Location='/api/customers/019ec504-fa7c-7685-b8fc-31ea06e2618e?api-version=2026-11-12'"
+      "evidence": "POST /api/customers -> 201, Location='/api/customers/019ec53b-9a6b-7b24-b6db-fcc95aeeaf1a?api-version=2026-11-12'"
     },
     "B2": {
       "pass": 1,
-      "evidence": "POST /api/products -> 201, Location='/api/products/019ec504-fb28-7c2b-8c7f-e1ed7f65abb4?api-version=2026-11-12'"
+      "evidence": "POST /api/products -> 201, Location='/api/products/019ec53b-9b02-793a-b9b3-a173750e07f4?api-version=2026-11-12'"
     },
     "B3": {
       "pass": 1,
-      "evidence": "POST /api/orders -> 201, Location='/api/orders/019ec504-fb98-77a3-a98b-24de8460db72?api-version=2026-11-12'"
+      "evidence": "POST /api/orders -> 201, Location='http://127.0.0.1:61887/api/Orders/019ec53b-9b90-77cb-a35c-91da0c429880?api-version=2026-11-12'"
     },
     "B4": {
       "pass": 1,
@@ -48,7 +48,7 @@
     },
     "C2": {
       "pass": 1,
-      "evidence": "submitA(qty5)->200; submitB(qty1 after)->400 (reserve consumed stock)"
+      "evidence": "submitA(qty5)->200; submitB(qty1 after)->422 (reserve consumed stock)"
     },
     "C3": {
       "pass": 1,
@@ -56,19 +56,19 @@
     },
     "C4": {
       "pass": 1,
-      "evidence": "approve(Draft) -> 400"
+      "evidence": "approve(Draft) -> 422"
     },
     "C5": {
       "pass": 1,
-      "evidence": "submit with insufficient stock -> 400"
+      "evidence": "submit with insufficient stock -> 422"
     },
     "C6": {
       "pass": 1,
-      "evidence": "empty=400 qty0=400 qty1000=400"
+      "evidence": "empty=422 qty0=422 qty1000=422"
     },
     "C7": {
       "pass": 1,
-      "evidence": "duplicate line-item rejected -> 400"
+      "evidence": "duplicate line-item rejected -> 422"
     },
     "C8": {
       "pass": 1,
@@ -88,11 +88,11 @@
     },
     "D4": {
       "pass": 1,
-      "evidence": "invalid customer -> 400"
+      "evidence": "invalid customer -> 422"
     },
     "D5": {
       "pass": 1,
-      "evidence": "404 ct='application/json; charset=utf-8'; 400 ct='application/json; charset=utf-8'"
+      "evidence": "404 ct='application/problem+json'; 400 ct='application/json; charset=utf-8'"
     },
     "D6": {
       "pass": 1,
@@ -107,12 +107,12 @@
       "evidence": "non-owner->403; admin->200; owner->200"
     },
     "E3": {
-      "pass": 1,
-      "evidence": "malformed actor header rejected on all variants (no silent elevation)"
+      "pass": 0,
+      "evidence": "malformed actor 'not-json-{{{' created a customer (201) \u2014 silent elevation"
     },
     "E4": {
-      "pass": 1,
-      "evidence": "no internal leakage in production error responses"
+      "pass": null,
+      "evidence": "service did not boot in Production; E4 not applicable"
     },
     "E5": {
       "pass": 1,
@@ -128,7 +128,7 @@
     },
     "F2": {
       "pass": 1,
-      "evidence": "passed=40 failed=0"
+      "evidence": "passed=17 failed=0"
     }
   }
 }
