@@ -4,11 +4,12 @@
 service an AI generates?** This repo answers that with a controlled, reproducible experiment
 and **framework-neutral** scoring — every claim is backed by raw, inspectable artifacts.
 
-The same task is handed to three frontier models, twice each: once building **with** Trellis
-(its template + framework + AI guidance) and once building a strong implementation **without**
-it. Eighteen generated services are then scored by an automated black-box harness on outcomes
-only — correct status codes, enforced authorization, no privilege escalation, no stack leakage,
-passing tests — **never** on whether the code uses any Trellis idiom.
+The same task is handed to three frontier models in two conditions, **three runs each**: building
+**with** Trellis (its template + framework + AI guidance) and building a strong implementation
+**without** it. The resulting **eighteen** generated services (3 models × 2 conditions × 3 runs) are
+then scored by an automated black-box harness on outcomes only — correct status codes, enforced
+authorization, no privilege escalation, no stack leakage, passing tests — **never** on whether the
+code uses any Trellis idiom.
 
 > The neutrality is the whole point. A benchmark that rewarded "uses `Result<T>`" would measure
 > adherence to Trellis, not quality. This one measures only what a reviewer or a production
@@ -16,9 +17,25 @@ passing tests — **never** on whether the code uses any Trellis idiom.
 
 ## Headline result
 
-See **[`results/summary.md`](results/summary.md)** for the generated table (mean pass rate over
-the 30 neutral criteria, per model, with the with-Trellis delta) and
-**[`results/criteria-matrix.md`](results/criteria-matrix.md)** for the per-criterion breakdown.
+Mean pass rate over the 30 framework-neutral criteria (3 runs per cell, 18 services):
+
+| Model | Without Trellis | With Trellis | Δ (pts) |
+|---|---|---|---|
+| gpt-5.5 | 99% | 100% | +1 |
+| opus-4.8 | 98% | 97% | −1 |
+| sonnet-4.6 | 96% | 95% | −0 |
+| **All models** | **97%** | **97%** | **±0** |
+
+**Outcome parity.** On this well-specified task, frontier models reach a spec-compliant,
+secure-in-production service **with or without** Trellis. 24 of the 30 criteria pass 100% in *every*
+cell; the few differences are model-specific (the recurring one — a malformed-header privilege
+escalation — fails on Trellis too, because it lives in application code).
+
+→ **[`RESULTS.md`](RESULTS.md)** is the full narrative: what the parity does and doesn't mean, the
+build-time-bug-prevention thesis with concrete evidence (a from-scratch server-wedging hang, an EF
+graph-state trap), the spec-dependent 422 finding, generation-cost numbers, and the contamination
+disclosure. The raw tables are **[`results/summary.md`](results/summary.md)** and
+**[`results/criteria-matrix.md`](results/criteria-matrix.md)**.
 
 > Results are regenerated from the raw runs by `harness/aggregate.py`; they are not hand-edited.
 
@@ -60,8 +77,10 @@ spec/                 the single, framework-agnostic spec given to every model
 prompts/              the two generation prompts (identical but for the framework)
 rubric/               the 30 outcome-only scoring criteria
 runs/                 the 18 raw generated services (+ per-run result.json)
+validation/           2 memory-off contamination-control runs (NOT in the headline aggregate)
 harness/              Python scorer: probe.py, static_checks.py, run_all.py, aggregate.py
 results/              generated headline + per-criterion tables
+RESULTS.md            the narrative read of the numbers (start here for findings)
 findings/             qualitative, non-scored evidence: model framework feedback + baseline self-assessments
 GENERATION.md         clean-room runbook for producing the 18 services
 METHODOLOGY.md        design, controls, and threats to validity
