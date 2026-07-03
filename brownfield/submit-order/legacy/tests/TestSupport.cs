@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore;
 /// <summary>Seeds products and draft orders into a legacy <see cref="AppDb"/>.</summary>
 internal static class Seed
 {
-    // Monotonic line-item ids so EF's "ORDER BY LineItem.Id" Include returns items in insertion
-    // order — makes the per-item-save corruption deterministic regardless of GUID sort.
+    // Monotonic line-item ids so the endpoint's explicit OrderBy(Id) processes items in insertion
+    // order — makes the per-item-save corruption deterministic regardless of how EF materializes the
+    // Include (which has no guaranteed order without an explicit sort).
     private static int _lineItemSequence;
 
     public static Guid Product(TestDb db, string name, int stock, decimal price)

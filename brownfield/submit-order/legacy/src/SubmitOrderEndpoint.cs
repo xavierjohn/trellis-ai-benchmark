@@ -25,7 +25,10 @@ public static class SubmitOrderEndpoint
         if (order.Status == "Cancelled")
             throw new InvalidOperationException("Order is cancelled.");
 
-        foreach (var item in order.Items)
+        // Process line items in a stable order (by their monotonic id). The real defect is the
+        // per-item save below; the explicit order just makes the reproduction deterministic instead
+        // of depending on EF Core's unspecified Include materialization order.
+        foreach (var item in order.Items.OrderBy(li => li.Id))
         {
             var product = await db.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
             if (product is null)
