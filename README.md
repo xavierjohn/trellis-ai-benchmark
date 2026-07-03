@@ -82,6 +82,7 @@ harness/              Python scorer: probe.py, static_checks.py, run_all.py, agg
 results/              generated headline + per-criterion tables
 RESULTS.md            the narrative read of the numbers (start here for findings)
 findings/             qualitative, non-scored evidence: model framework feedback + baseline self-assessments
+brownfield/           before/after conversion proofs (one messy endpoint rebuilt on Trellis)
 GENERATION.md         clean-room runbook for producing the 18 services
 METHODOLOGY.md        design, controls, and threats to validity
 ```
@@ -102,6 +103,15 @@ To regenerate the services, follow the clean-room runbook in
 file in [`prompts/paste/`](prompts/paste/) (prompt + spec, nothing else), then dropped into the
 matching `runs/<condition>/<model>/run-N/` folder. See [`runs/README.md`](runs/README.md) for
 the folder convention and the per-run `meta.json` audit schema.
+
+## Brownfield proofs
+
+The generation benchmark above asks whether Trellis changes AI output when building a service *from
+scratch* — and finds outcome parity on this well-specified task. [`brownfield/`](brownfield/) asks the
+complementary question about *existing* code: take one messy endpoint, convert a single slice to
+Trellis, and measure what changes. Each proof is a **runnable** legacy implementation whose tests pass
+by *reproducing* its defects, paired against the scored Trellis reference — a narrow, concrete take on
+"proof over surface area."
 
 ## License
 
